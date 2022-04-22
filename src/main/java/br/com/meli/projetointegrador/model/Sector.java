@@ -20,7 +20,7 @@ public class Sector {
     private Long id;
     private String name;
     private String category;
-    private Double size;
+    private Integer size;
 
     @ManyToOne
     private Warehouse warehouse;
