@@ -30,12 +30,12 @@ public class Batch {
     @OneToMany(mappedBy = "batch", cascade = CascadeType.ALL)
     private List<Product> products = new ArrayList<>();
 
-//    @ManyToOne
-//    @JoinColumn(name = "inbound_order_id")
-//    private InboundOrder inboundOrder;
+    @ManyToOne
+    @JoinColumn(name = "inbound_order_id")
+    private InboundOrder inboundOrder;
 
-//    @ManyToOne
-//    @JoinColumn(name = "sector_id")
-//    private Sector sector;
+    @ManyToOne
+    @JoinColumn(name = "sector_id")
+    private Sector sector;
 
 }

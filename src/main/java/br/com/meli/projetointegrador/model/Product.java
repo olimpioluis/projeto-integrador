@@ -28,7 +28,7 @@ public class Product {
     @JoinColumn(name = "batch_id")
     private Batch batch;
 
-//    @OneToOne
-//    private Advertisement advertisement;
+    @OneToOne
+    private Advertisement advertisement;
 
 }
