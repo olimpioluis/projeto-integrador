@@ -26,7 +26,7 @@ public class InboundOrder {
     // Um representante vendeu vários lotes
 
     @OneToMany(mappedBy = "InboundOrder", cascade = CascadeType.ALL)
-    private List<Batch> itens = new ArrayList<Batch>();
+    private List<Batch> products = new ArrayList<Batch>();
 
     private List<StockManager> itens = new ArrayList<StockManager>();
 
