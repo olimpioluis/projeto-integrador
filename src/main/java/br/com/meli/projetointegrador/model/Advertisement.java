@@ -7,10 +7,13 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
-@Entity
+
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter @Setter
+@Entity
+@Table(name = "advertisement")
 public class Advertisement {
 
     @Id

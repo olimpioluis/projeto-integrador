@@ -1,34 +1,29 @@
 package br.com.meli.projetointegrador.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.w3c.dom.stylesheets.LinkStyle;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.persistence.OneToOne;
-
-@Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name="product")
 public class Product {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
     private Double price;
     private Double width;
     private Double height;
 
-    @ManyToOne
-    @JoinColumn(name = "batch_id")
-    private Batch batch;
-
-    @OneToOne
-    private Advertisement advertisement;
+    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
+    private List<Batch> batchList = new ArrayList<>();
 
 }

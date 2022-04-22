@@ -5,29 +5,24 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
-@Table(name="InboundOrder")
+@Table(name="inbound_order")
 public class InboundOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     private LocalDate orderDate;
 
-    // Um representante vendeu vários lotes
+    @OneToMany(mappedBy = "inboundOrder", cascade = CascadeType.ALL)
+    private List<Batch> batchList = new ArrayList<Batch>();
 
-    @OneToMany(mappedBy = "InboundOrder", cascade = CascadeType.ALL)
-    private List<Batch> products = new ArrayList<Batch>();
-
-    private List<StockManager> itens = new ArrayList<StockManager>();
-
+    @ManyToOne
+    private StockManager stockManager;
 }

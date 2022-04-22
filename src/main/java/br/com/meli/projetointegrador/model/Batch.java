@@ -1,23 +1,23 @@
 package br.com.meli.projetointegrador.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-@Entity
-@Data
-@AllArgsConstructor
+
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "batch")
 public class Batch {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
     private Double currentTemperature;
     private Double minTemperature;
@@ -27,15 +27,13 @@ public class Batch {
     private LocalDateTime manufacturingTime;
     private LocalDate expirationDate;
 
-    @OneToMany(mappedBy = "batch", cascade = CascadeType.ALL)
-    private List<Product> products = new ArrayList<>();
+    @ManyToOne
+    private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "inbound_order_id")
     private InboundOrder inboundOrder;
 
     @ManyToOne
-    @JoinColumn(name = "sector_id")
     private Sector sector;
 
 }

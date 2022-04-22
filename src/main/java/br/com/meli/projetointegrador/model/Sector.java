@@ -1,31 +1,32 @@
 package br.com.meli.projetointegrador.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 import java.util.List;
 
-@Entity
-@Data
-@AllArgsConstructor
+
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name="sector")
 public class Sector {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String category;
     private Double size;
 
     @ManyToOne
-    @JoinColumn(name = "warehouse_id")
     private Warehouse warehouse;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Batch> batches;
+    @OneToMany(mappedBy = "sector",cascade = CascadeType.ALL)
+    private List<Batch> batchList;
 }
 
 

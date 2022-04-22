@@ -1,25 +1,26 @@
 package br.com.meli.projetointegrador.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Entity
+@Table(name="warehouse")
 public class Warehouse {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
 
-    @OneToMany
-    private  StockManager stockManager;
+    @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL)
+    private List<StockManager> stockManagerList = new ArrayList<StockManager>();
 
-    @OneToMany
-    private Sector sector;
+    @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL)
+    private List<Sector> sectorList = new ArrayList<Sector>();
 }
