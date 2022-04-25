@@ -19,6 +19,8 @@ public class Section {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+
+    @Enumerated(EnumType.STRING)
     private Category category;
     private Integer size;
 
