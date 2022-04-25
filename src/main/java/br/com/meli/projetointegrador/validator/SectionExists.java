@@ -1,19 +1,18 @@
 package br.com.meli.projetointegrador.validator;
 
 import br.com.meli.projetointegrador.exception.InexistentSectionException;
-import br.com.meli.projetointegrador.model.Sector;
+import br.com.meli.projetointegrador.repository.SectionRepository;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class SectionExists implements  Validator {
+public class SectionExists implements Validator {
 
     private final SectionRepository sectionRepository;
-    private final String sectionCode;
+    private final Long sectionId;
 
     @Override
     public void validate() {
-        Sector section = sectionRepository.findById(sectionCode);
-        if (section.getId() == null) {
+        if (sectionRepository.findById(sectionId).isEmpty()) {
             throw new InexistentSectionException("The informed Section does not exists!");
         }
     }

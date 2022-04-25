@@ -34,6 +34,6 @@ public class Batch {
     private InboundOrder inboundOrder;
 
     @ManyToOne
-    private Sector sector;
+    private Section section;
 
 }
