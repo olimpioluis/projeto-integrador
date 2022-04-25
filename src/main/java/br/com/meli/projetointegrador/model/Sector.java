@@ -19,7 +19,7 @@ public class Sector {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String category;
+    private Category category;
     private Double size;
 
     @ManyToOne

@@ -12,7 +12,7 @@ public class WarehouseExistsValidator implements Validator{
     private WarehouseRepository warehouseRepository;
 
     @Override
-    public void valida() {
+    public void validate() {
         if (!warehouseRepository.existsById(warehouse.getId())) throw new WarehouseNotExistsException("Este armazem não existe.");
     }
 }
