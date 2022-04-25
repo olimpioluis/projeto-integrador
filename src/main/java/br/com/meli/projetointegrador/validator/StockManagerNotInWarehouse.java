@@ -12,7 +12,7 @@ public class StockManagerNotInWarehouse implements Validator {
     private final String warehouseCode;
 
     @Override
-    public void valida() {
+    public void validate() {
         StockManager stockManager = stockManagerRepository.findById(stockManagerCode);
         if (stockManager.getWarehouse() != null && !stockManager.getWarehouse().getId().equals(warehouseCode)) {
             throw new StockManagerNotInWarehouseException("Stock Manager does not belong to this warehouse!");
