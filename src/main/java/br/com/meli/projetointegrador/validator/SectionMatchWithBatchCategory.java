@@ -12,11 +12,11 @@ public class SectionMatchWithBatchCategory implements Validator {
 
     @Override
     public void validate() {
-        if (batch.getMinTemperature() < 0 && !batch.getSection().getCategory().equals(Category.FROZEN)) {
+        if (batch.getMinTemperature() < 0 && !batch.getSection().getCategory().name().equals(Category.FROZEN.name())) {
             throw new SectionMatchWithBatchCategoryException("Batch does not match  this section!");
-        } else if (batch.getMinTemperature() < 10 && !batch.getSection().getCategory().equals(Category.REFRIGERATED)) {
+        } else if (batch.getMinTemperature() < 10 && !batch.getSection().getCategory().name().equals(Category.REFRIGERATED.name())) {
             throw new SectionMatchWithBatchCategoryException("Batch does not match  this section!");
-        } else if (batch.getMinTemperature() >= 10 && !batch.getSection().getCategory().equals(Category.FRESH)) {
+        } else if (batch.getMinTemperature() >= 10 && !batch.getSection().getCategory().name().equals(Category.FRESH.name())) {
             throw new SectionMatchWithBatchCategoryException("Batch does not match  this section!");
         }
     }
