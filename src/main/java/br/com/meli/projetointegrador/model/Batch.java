@@ -1,5 +1,6 @@
 package br.com.meli.projetointegrador.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "batch")
 public class Batch {
@@ -18,7 +20,6 @@ public class Batch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
     private Double currentTemperature;
     private Double minTemperature;
     private Integer initialQuantity;
@@ -27,12 +28,15 @@ public class Batch {
     private LocalDateTime manufacturingTime;
     private LocalDate expirationDate;
 
+    @JsonIgnore
     @ManyToOne
     private Product product;
 
+    @JsonIgnore
     @ManyToOne
     private InboundOrder inboundOrder;
 
+    @JsonIgnore
     @ManyToOne
     private Section section;
 
