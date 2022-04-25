@@ -12,8 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="sector")
-public class Sector {
+@Table(name="section")
+public class Section {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,7 @@ public class Sector {
     @ManyToOne
     private Warehouse warehouse;
 
-    @OneToMany(mappedBy = "sector",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "section",cascade = CascadeType.ALL)
     private List<Batch> batchList;
 }
 
