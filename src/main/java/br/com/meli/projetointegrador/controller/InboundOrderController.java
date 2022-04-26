@@ -1,11 +1,10 @@
 package br.com.meli.projetointegrador.controller;
 
+import br.com.meli.projetointegrador.dto.BatchStockDTO;
 import br.com.meli.projetointegrador.dto.InboundOrderDTO;
+import br.com.meli.projetointegrador.dto.InboundOrderPutDTO;
 import br.com.meli.projetointegrador.model.Batch;
-import br.com.meli.projetointegrador.service.InboundOrderService;
-import br.com.meli.projetointegrador.service.ProductService;
-import br.com.meli.projetointegrador.service.SectionService;
-import br.com.meli.projetointegrador.service.WarehouseService;
+import br.com.meli.projetointegrador.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +28,16 @@ public class InboundOrderController {
     @Autowired
     private WarehouseService warehouseService;
 
+    @Autowired
+    private BatchService batchService;
+
     @PostMapping
-    public ResponseEntity<List<Batch>> postInboundOrder(@RequestBody InboundOrderDTO inboundOrderDTO) {
-        return new ResponseEntity<>(inboundOrderService.save(InboundOrderDTO.map(inboundOrderDTO, sectionService, productService, warehouseService)), HttpStatus.CREATED);
+    public ResponseEntity<List<BatchStockDTO>> postInboundOrder(@RequestBody InboundOrderDTO inboundOrderDTO) {
+        return new ResponseEntity<>(BatchStockDTO.map(inboundOrderService.save(InboundOrderDTO.map(inboundOrderDTO, sectionService, productService, warehouseService))), HttpStatus.CREATED);
     }
 
-//    @PutMapping
-//    public ResponseEntity<String> putInboundOrder(@RequestBody InboundOrderDTO inboundOrderDTO) {
-//        return new ResponseEntity<>(inboundOrderService.update(inboundOrderDTO), HttpStatus.CREATED);
-//    }
+    @PutMapping
+    public ResponseEntity<List<BatchStockDTO>> putInboundOrder(@RequestBody InboundOrderPutDTO inboundOrderPutDTO) {
+        return new ResponseEntity<>(BatchStockDTO.map(inboundOrderService.update(InboundOrderPutDTO.map(inboundOrderPutDTO, inboundOrderService, sectionService, warehouseService, productService, batchService))), HttpStatus.CREATED);
+    }
 }
