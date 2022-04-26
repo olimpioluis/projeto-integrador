@@ -1,7 +1,6 @@
 package br.com.meli.projetointegrador.service;
 
 import br.com.meli.projetointegrador.exception.InexistentInboundOrderException;
-import br.com.meli.projetointegrador.exception.SectionMatchWithBatchCategoryException;
 import br.com.meli.projetointegrador.model.Batch;
 import br.com.meli.projetointegrador.model.InboundOrder;
 import br.com.meli.projetointegrador.repository.*;
@@ -27,6 +26,7 @@ public class InboundOrderServiceImpl implements InboundOrderService {
         List<Validator> validators = Arrays.asList(
                 new SectionAvailableSpace(sectionRepository, inboundOrder.getSection().getId(), inboundOrder),
                 new SectionExists(sectionRepository, inboundOrder.getSection().getId()),
+                new SectionMatchWithWarehouse(inboundOrder.getSection(),sectionRepository),
 //                new StockManagerNotInWarehouse(stockManagerRepository, inboundOrder.getStockManager().getId(), inboundOrder.getSection().getWarehouse().getId()),
                 new WarehouseExists(inboundOrder.getSection().getWarehouse().getId(), warehouseRepository)
         );

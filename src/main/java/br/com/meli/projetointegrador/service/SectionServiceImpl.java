@@ -13,6 +13,6 @@ public class SectionServiceImpl implements SectionService {
     private SectionRepository sectionRepository;
     @Override
     public Section findById(Long id) {
-        return sectionRepository.findById(id).orElseThrow(() -> new InexistentSectionException("Sector " + id + " does not exists!"));
+        return sectionRepository.findById(id).orElseThrow(() -> new InexistentSectionException("Section " + id + " does not exists!"));
     }
 }

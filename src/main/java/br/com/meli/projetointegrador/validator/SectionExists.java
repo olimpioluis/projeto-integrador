@@ -13,7 +13,7 @@ public class SectionExists implements Validator {
     @Override
     public void validate() {
         if (sectionRepository.findById(sectionId).isEmpty()) {
-            throw new InexistentSectionException("The informed Section does not exists!");
+            throw new InexistentSectionException("Section " + sectionId + " does not exists!");
         }
     }
 }

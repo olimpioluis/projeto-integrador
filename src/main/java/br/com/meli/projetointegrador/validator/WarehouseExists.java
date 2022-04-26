@@ -12,6 +12,6 @@ public class WarehouseExists implements Validator{
 
     @Override
     public void validate() {
-        if (warehouseRepository.findById(warehouseId).isEmpty()) throw new InexistentWarehouseException("The informed Warehouse does not exists!");
+        if (warehouseRepository.findById(warehouseId).isEmpty()) throw new InexistentWarehouseException("Warehouse " + warehouseId + " does not exists!");
     }
 }
