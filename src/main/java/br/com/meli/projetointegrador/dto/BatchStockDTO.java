@@ -4,11 +4,13 @@ import br.com.meli.projetointegrador.model.Batch;
 import br.com.meli.projetointegrador.model.Section;
 import br.com.meli.projetointegrador.service.ProductService;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 public class BatchStockDTO {
     private Long productId;
     private Double currentTemperature;
