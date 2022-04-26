@@ -1,9 +1,13 @@
 package br.com.meli.projetointegrador;
 
 
+import br.com.meli.projetointegrador.dto.BatchStockDTO;
+import br.com.meli.projetointegrador.dto.ErrorDTO;
 import br.com.meli.projetointegrador.dto.InboundOrderDTO;
+import br.com.meli.projetointegrador.dto.SectionDTO;
 import br.com.meli.projetointegrador.model.Batch;
 import br.com.meli.projetointegrador.repository.BatchRepository;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -12,12 +16,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -32,10 +38,9 @@ public class InboundOrderIntegrationTests {
     @Autowired
     private BatchRepository batchRepository;
 
-    @Test
-    void registerValidInboundOrder() throws Exception {
 
-        String inboundOrderString = "{\n" +
+    private String getStandardInboundOrder() {
+        return "{\n" +
                 "    \"orderNumber\": 2,\n" +
                 "    \"orderDate\": \"2020-01-05\",\n" +
                 "    \"section\": {\n" +
@@ -55,14 +60,26 @@ public class InboundOrderIntegrationTests {
                 "        }\n" +
                 "    ]\n" +
                 "}";
+    }
 
+    private String postInboundOrder(InboundOrderDTO inboundOrderDTO, ResultMatcher resultMatcher) throws Exception {
+
+        MvcResult response = mockmvc.perform(post("/api/v1/fresh-products/inboundorder")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(inboundOrderDTO)))
+                .andExpect(resultMatcher)
+                .andReturn();
+
+        return response.getResponse().getContentAsString();
+    }
+
+    @Test
+    void registerValidInboundOrder() throws Exception {
+
+        String inboundOrderString = getStandardInboundOrder();
         InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
 
-        mockmvc.perform(post("/api/v1/fresh-products/inboundorder")
-        .contentType("application/json")
-        .content(objectMapper.writeValueAsString(inboundOrderDTO)))
-                .andExpect(status().isCreated());
-
+        postInboundOrder(inboundOrderDTO, status().isCreated());
         Batch batch = batchRepository.findBySectionId(6L);
 
         assertAll(
@@ -73,39 +90,114 @@ public class InboundOrderIntegrationTests {
     }
 
     @Test
-    void InboundOrderInvalidSection() throws Exception {
+    void InvalidSectionAndWarehouse() throws Exception {
 
-        String inboundOrderString = "{\n" +
-                "    \"orderNumber\": 2,\n" +
-                "    \"orderDate\": \"2020-01-05\",\n" +
-                "    \"section\": {\n" +
-                "        \"sectionCode\": 666,\n" +
-                "        \"warehouseCode\": 2\n" +
-                "    },\n" +
-                "    \"batchStock\": [\n" +
-                "        {\n" +
-                "            \"productId\": 1,\n" +
-                "            \"currentTemperature\": 25.5,\n" +
-                "            \"minTemperature\": 10.5,\n" +
-                "            \"initialQuantity\": 20,\n" +
-                "            \"currentQuantity\": 20,\n" +
-                "            \"manufacturingDate\": \"2022-01-01\",\n" +
-                "            \"manufacturingTime\": \"2022-01-01T00:00:00\",\n" +
-                "            \"expirationDate\": \"2022-02-02\"\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}";
-
+        String inboundOrderString = getStandardInboundOrder();
         InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
 
-        MvcResult reponseController = mockmvc.perform(post("/api/v1/fresh-products/inboundorder")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(inboundOrderDTO)))
-                .andExpect(status().isBadRequest())
-                .andReturn();
+        SectionDTO inboundSectionDto = inboundOrderDTO.getSection();
+        inboundSectionDto.setSectionCode(666L);
+        inboundOrderDTO.setSection(inboundSectionDto);
 
-        // Validar ErrorDTO retornado para InexistentSectionException
+        String responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest());
+        ErrorDTO errorDtoSection = objectMapper.readValue(responseStr, new TypeReference<>() {});
+
+        assertEquals("Section 666 does not exists!", errorDtoSection.getDescription());
+
+
+        inboundSectionDto.setSectionCode(6L);
+        inboundSectionDto.setWarehouseCode(777L);
+        inboundOrderDTO.setSection(inboundSectionDto);
+
+        responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest());
+        ErrorDTO errorDtoWarehouse = objectMapper.readValue(responseStr, new TypeReference<>() {});
+
+        assertEquals("Warehouse 777 does not exists!", errorDtoWarehouse.getDescription());
 
     }
 
+    @Test
+    void InexistentProduct() throws Exception {
+
+        String inboundOrderString = getStandardInboundOrder();
+        InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
+
+        List<BatchStockDTO> batchStockDTOList = inboundOrderDTO.getBatchStock();
+        BatchStockDTO batchStockDTO = batchStockDTOList.get(0);
+
+        batchStockDTO.setProductId(111L);
+        batchStockDTOList.remove(0);
+        batchStockDTOList.add(batchStockDTO);
+
+        inboundOrderDTO.setBatchStock(batchStockDTOList);
+
+        String responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest());
+        ErrorDTO errorDtoSection = objectMapper.readValue(responseStr, new TypeReference<>() {});
+
+        assertEquals("Product 111 does not exists!", errorDtoSection.getDescription());
+
+    }
+
+    @Test
+    void SectionAndBatchMismatch() throws Exception {
+        String inboundOrderString = getStandardInboundOrder();
+        InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
+
+        List<BatchStockDTO> batchStockDTOList = inboundOrderDTO.getBatchStock();
+        BatchStockDTO batchStockDTO = batchStockDTOList.get(0);
+
+        batchStockDTO.setMinTemperature(-1.0);
+        batchStockDTOList.remove(0);
+        batchStockDTOList.add(batchStockDTO);
+
+        inboundOrderDTO.setBatchStock(batchStockDTOList);
+
+        String responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest());
+        ErrorDTO errorDtoSection = objectMapper.readValue(responseStr, new TypeReference<>() {});
+
+        assertEquals("Batch does not match this section!", errorDtoSection.getDescription());
+    }
+
+    @Test
+    void SectionAndWarehouseMismatch() throws Exception {
+        String inboundOrderString = getStandardInboundOrder();
+        InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
+
+        SectionDTO inboundSectionDto = inboundOrderDTO.getSection();
+        inboundSectionDto.setSectionCode(2L);
+        inboundSectionDto.setWarehouseCode(2L);
+        inboundOrderDTO.setSection(inboundSectionDto);
+
+        String responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest());
+        ErrorDTO errorDtoSection = objectMapper.readValue(responseStr, new TypeReference<>() {});
+
+        assertEquals("The informed Section does not match with informed Warehouse!", errorDtoSection.getDescription());
+
+    }
+
+    @Test
+    void SectionUnavailableSpace() throws Exception {
+        String inboundOrderString = getStandardInboundOrder();
+        InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
+
+        SectionDTO inboundSectionDto = inboundOrderDTO.getSection();
+        inboundSectionDto.setSectionCode(4L);
+        inboundOrderDTO.setSection(inboundSectionDto);
+
+        List<BatchStockDTO> batchStockDTOList = inboundOrderDTO.getBatchStock();
+        BatchStockDTO batchStockDTO = batchStockDTOList.get(0);
+        batchStockDTO.setMinTemperature(-1.0);
+        batchStockDTOList.remove(0);
+
+        for (int i = 0; i < 101; i++) {
+            batchStockDTOList.add(batchStockDTO);
+        }
+
+        inboundOrderDTO.setBatchStock(batchStockDTOList);
+
+        String responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest());
+        ErrorDTO errorDtoSection = objectMapper.readValue(responseStr, new TypeReference<>() {});
+
+        assertEquals("Section has no available space.", errorDtoSection.getDescription());
+    }
 }
