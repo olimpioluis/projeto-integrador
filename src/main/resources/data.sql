@@ -31,39 +31,45 @@ INSERT INTO stock_manager (person_id ,warehouse_id ) VALUES
 
 /* SECTIONS */
 
-INSERT INTO section (category,name,size,warehouse_id) VALUES
+INSERT INTO section (category,name,size,current_size,warehouse_id) VALUES
 (('FROZEN'),
  ('FROZEN'),
  (100),
- (SELECT id from warehouse WHERE name='warehouse-sp'));
-
-INSERT INTO section (category,name,size,warehouse_id) VALUES
-(('REFRIGERATED'),
- ('REFRIGERATED'),
  (100),
  (SELECT id from warehouse WHERE name='warehouse-sp'));
 
-INSERT INTO section (category,name,size,warehouse_id) VALUES
+INSERT INTO section (category,name,size,current_size,warehouse_id) VALUES
+(('REFRIGERATED'),
+ ('REFRIGERATED'),
+ (100),
+ (100),
+ (SELECT id from warehouse WHERE name='warehouse-sp'));
+
+INSERT INTO section (category,name,size,current_size,warehouse_id) VALUES
 (('FRESH'),
  ('FRESH'),
  (300),
+ (300),
  (SELECT id from warehouse WHERE name='warehouse-sp'));
 
-INSERT INTO section (category,name,size,warehouse_id) VALUES
+INSERT INTO section (category,name,size,current_size,warehouse_id) VALUES
 (('FROZEN'),
  ('FROZEN'),
  (100),
- (SELECT id from warehouse WHERE name='warehouse-ba'));
-
-INSERT INTO section (category,name,size,warehouse_id) VALUES
-(('REFRIGERATED'),
- ('REFRIGERATED'),
  (100),
  (SELECT id from warehouse WHERE name='warehouse-ba'));
 
-INSERT INTO section (category,name,size,warehouse_id) VALUES
+INSERT INTO section (category,name,size,current_size,warehouse_id) VALUES
+(('REFRIGERATED'),
+ ('REFRIGERATED'),
+ (100),
+ (100),
+ (SELECT id from warehouse WHERE name='warehouse-ba'));
+
+INSERT INTO section (category,name,size,current_size,warehouse_id) VALUES
 (('FRESH'),
  ('FRESH'),
+ (300),
  (300),
  (SELECT id from warehouse WHERE name='warehouse-ba'));
 
