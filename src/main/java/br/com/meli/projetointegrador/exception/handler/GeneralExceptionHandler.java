@@ -16,6 +16,12 @@ public class GeneralExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InexistentBatchException.class)
+    protected ResponseEntity<ErrorDTO> handleInexistentBatchExceptionException(InexistentBatchException ex){
+        ErrorDTO error = new ErrorDTO("InexistentBatchException", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(InexistentProductException.class)
     protected ResponseEntity<ErrorDTO> handleInexistentProductException(InexistentProductException ex){
         ErrorDTO error = new ErrorDTO("InexistentProductException", ex.getMessage());
