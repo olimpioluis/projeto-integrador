@@ -14,6 +14,6 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public Warehouse findById(Long id) {
-        return warehouseRepository.findById(id).orElseThrow(() -> new InexistentWarehouseException("The informed Warehouse does not exists!"));
+        return warehouseRepository.findById(id).orElseThrow(() -> new InexistentWarehouseException("Warehouse "+ id + " does not exists!"));
     }
 }
