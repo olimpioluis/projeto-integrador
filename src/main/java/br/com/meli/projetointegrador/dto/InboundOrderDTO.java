@@ -30,7 +30,7 @@ public class InboundOrderDTO {
         return InboundOrder.builder()
                 .orderNumber(inboundOrderDTO.getOrderNumber())
                 .orderDate(inboundOrderDTO.getOrderDate())
-                .section(new Section(section.getId(), section.getName(), section.getCategory(), section.getSize(), warehouse, section.getBatchList()))
+                .section(new Section(section.getId(), section.getName(), section.getCategory(), section.getSize(), section.getCurrentSize(), warehouse, section.getBatchList()))
                 .batchList(batches)
                 .build();
     }
