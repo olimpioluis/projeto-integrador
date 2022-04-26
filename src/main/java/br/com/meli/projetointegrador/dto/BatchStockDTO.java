@@ -3,12 +3,16 @@ package br.com.meli.projetointegrador.dto;
 import br.com.meli.projetointegrador.model.Batch;
 import br.com.meli.projetointegrador.model.Section;
 import br.com.meli.projetointegrador.service.ProductService;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
+@AllArgsConstructor
 public class BatchStockDTO {
     private Long productId;
     private Double currentTemperature;
@@ -31,5 +35,18 @@ public class BatchStockDTO {
                 .expirationDate(batchStockDTO.getExpirationDate())
                 .section(section)
                 .build();
+    }
+
+    public static List<BatchStockDTO> map(List<Batch> batches) {
+        return batches.stream().map(batch -> new BatchStockDTO(
+                batch.getProduct().getId(),
+                batch.getCurrentTemperature(),
+                batch.getMinTemperature(),
+                batch.getInitialQuantity(),
+                batch.getCurrentQuantity(),
+                batch.getManufacturingDate(),
+                batch.getManufacturingTime(),
+                batch.getExpirationDate()
+        )).collect(Collectors.toList());
     }
 }
