@@ -1,3 +1,4 @@
+
 -- CREATE DATABASE IF NOT EXISTS meli_fresh;
 -- USE meli_fresh;
 

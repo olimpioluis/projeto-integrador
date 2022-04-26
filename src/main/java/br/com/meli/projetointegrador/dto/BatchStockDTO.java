@@ -5,6 +5,7 @@ import br.com.meli.projetointegrador.model.Section;
 import br.com.meli.projetointegrador.service.ProductService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
+@Setter
 @AllArgsConstructor
 public class BatchStockDTO {
     private Long productId;
