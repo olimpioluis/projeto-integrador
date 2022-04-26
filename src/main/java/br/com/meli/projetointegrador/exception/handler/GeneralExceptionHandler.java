@@ -34,9 +34,9 @@ public class GeneralExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(SectionMatchWithBatchCategoryException.class)
-    protected ResponseEntity<ErrorDTO> handleSectionMatchWithBatchCategoryException(SectionMatchWithBatchCategoryException ex){
-        ErrorDTO error = new ErrorDTO("SectionMatchWithBatchCategoryException", ex.getMessage());
+    @ExceptionHandler(SectionNotMatchWithBatchCategoryException.class)
+    protected ResponseEntity<ErrorDTO> handleSectionNotMatchWithBatchCategoryException(SectionNotMatchWithBatchCategoryException ex){
+        ErrorDTO error = new ErrorDTO("SectionNotMatchWithBatchCategoryException", ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
@@ -46,9 +46,15 @@ public class GeneralExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(StockManagerNotInWarehouseException.class)
-    protected ResponseEntity<ErrorDTO> handleStockManagerNotInWarehouseException(StockManagerNotInWarehouseException ex){
-        ErrorDTO error = new ErrorDTO("StockManagerNotInWarehouseException", ex.getMessage());
+    @ExceptionHandler(StockManagerNotMatchWithWarehouseException.class)
+    protected ResponseEntity<ErrorDTO> handleStockManagerNotMatchWithWarehouseException(StockManagerNotMatchWithWarehouseException ex){
+        ErrorDTO error = new ErrorDTO("StockManagerNotMatchWithWarehouseException", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SectionNotMatchWithWarehouseException.class)
+    protected ResponseEntity<ErrorDTO> handleSectionNotMatchWithWarehouseException(SectionNotMatchWithWarehouseException ex){
+        ErrorDTO error = new ErrorDTO("SectionNotMatchWithWarehouseException", ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
