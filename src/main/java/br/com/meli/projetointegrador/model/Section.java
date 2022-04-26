@@ -23,6 +23,7 @@ public class Section {
     @Enumerated(EnumType.STRING)
     private Category category;
     private Integer size;
+    private Integer currentSize;
 
 
     @ManyToOne
