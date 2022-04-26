@@ -6,6 +6,8 @@ import br.com.meli.projetointegrador.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class ProductServiceImpl implements ProductService {
@@ -14,5 +16,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product findById(Long id) {
         return productRepository.findById(id).orElseThrow(() -> new InexistentProductException("Product " + id + " does not exists!"));
+    }
+    public List<Product> findAll(){
+        return productRepository.findAll();
     }
 }
