@@ -20,7 +20,7 @@ public class StockManager {
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
-    private Person person;
+    private User user;
 
     @ManyToOne
     private Warehouse warehouse;
