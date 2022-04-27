@@ -29,12 +29,5 @@ public class InboundOrderPutDTO {
 
         return inboundOrder;
 
-//                InboundOrder.builder()
-//                .id(inboundOrderPutDTO.getInboundOrderId())
-//                .orderNumber(inboundOrder.getOrderNumber())
-//                .orderDate(Objects.isNull(inboundOrderPutDTO.getOrderDate()) ? inboundOrder.getOrderDate() : inboundOrderPutDTO.getOrderDate())
-//                .section(new Section(section.getId(), section.getName(), section.getCategory(), section.getSize(), warehouse, section.getBatchList()))
-//                .batchList(batches)
-//                .build();
     }
 }

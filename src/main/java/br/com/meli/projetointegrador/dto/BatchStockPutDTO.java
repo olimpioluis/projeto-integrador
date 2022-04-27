@@ -46,18 +46,5 @@ public class BatchStockPutDTO {
         batch.setExpirationDate(Objects.isNull(batchStockPutDTO.getExpirationDate()) ? batch.getExpirationDate() : batchStockPutDTO.getExpirationDate());
 
         return batch;
-//                Batch.builder()
-//                .id(batch.getId())
-//                .product(batch.getProduct())
-//                .currentTemperature(batch.getCurrentTemperature())
-//                .minTemperature(batch.getMinTemperature())
-//                .initialQuantity(batch.getInitialQuantity())
-//                .currentQuantity(batch.getCurrentQuantity())
-//                .manufacturingDate(Objects.isNull(batchStockPutDTO.getManufacturingDate()) ? batch.getManufacturingDate() : batchStockPutDTO.getManufacturingDate())
-//                .manufacturingTime(Objects.isNull(batchStockPutDTO.getManufacturingTime()) ? batch.getManufacturingTime() : batchStockPutDTO.getManufacturingTime())
-//                .expirationDate(Objects.isNull(batchStockPutDTO.getExpirationDate()) ? batch.getExpirationDate() : batchStockPutDTO.getExpirationDate())
-//                .section(batch.getSection())
-//                .inboundOrder(batch.getInboundOrder())
-//                .build();
     }
 }
