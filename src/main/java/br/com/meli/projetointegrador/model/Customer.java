@@ -19,7 +19,7 @@ public class Customer {
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
-    private Person person;
+    private User user;
 
 
 }
