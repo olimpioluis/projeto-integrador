@@ -28,12 +28,12 @@ public class InboundOrderServiceImpl implements InboundOrderService {
     @Override
     public List<Batch> save(InboundOrder inboundOrder) {
         List<Validator> validators = Arrays.asList(
-                new SectionAvailableSpace(sectionRepository, inboundOrder.getSection().getId(), inboundOrder.getBatchList()),
+                new WarehouseExists(inboundOrder.getSection().getWarehouse().getId(), warehouseRepository),
                 new SectionExists(sectionRepository, inboundOrder.getSection().getId()),
-                new SectionMatchWithWarehouse(inboundOrder.getSection(),sectionRepository),
-                new SectionMatchWithWarehouse(inboundOrder.getSection(), sectionRepository),
+                new SectionAvailableSpace(sectionRepository, inboundOrder.getSection().getId(), inboundOrder.getBatchList()),
+                new SectionMatchWithWarehouse(inboundOrder.getSection(),sectionRepository)
 //                new StockManagerNotInWarehouse(stockManagerRepository, inboundOrder.getStockManager().getId(), inboundOrder.getSection().getWarehouse().getId()),
-                new WarehouseExists(inboundOrder.getSection().getWarehouse().getId(), warehouseRepository)
+
         );
 
         validators.forEach(Validator::validate);
@@ -51,7 +51,6 @@ public class InboundOrderServiceImpl implements InboundOrderService {
 
     @Override
     public List<Batch> update(InboundOrder inboundOrder) {
-        InboundOrder inboundOrderExists = findById(inboundOrder.getId());
         List<Batch> newBatches = inboundOrder.getBatchList().stream().filter(batch -> Objects.isNull(batch.getId())).collect(Collectors.toList());
 
         List<Validator> validators = Arrays.asList(
