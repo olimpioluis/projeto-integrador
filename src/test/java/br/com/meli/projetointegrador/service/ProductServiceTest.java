@@ -18,11 +18,13 @@ public class ProductServiceTest {
 
     @Mock
     private ProductRepository productRepository;
+    @Mock
+    private BatchService batchService;
 
     @BeforeEach
     private void initializeProductService() {
         MockitoAnnotations.openMocks(this);
-        this.productService = new ProductServiceImpl(productRepository);
+        this.productService = new ProductServiceImpl(productRepository, batchService);
     }
 
     @Test
