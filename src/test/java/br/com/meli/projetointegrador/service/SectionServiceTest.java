@@ -1,12 +1,10 @@
-package br.com.meli.projetointegrador;
+package br.com.meli.projetointegrador.service;
 
 import br.com.meli.projetointegrador.model.Batch;
 import br.com.meli.projetointegrador.model.Category;
 import br.com.meli.projetointegrador.model.Section;
 import br.com.meli.projetointegrador.model.Warehouse;
 import br.com.meli.projetointegrador.repository.SectionRepository;
-import br.com.meli.projetointegrador.service.SectionService;
-import br.com.meli.projetointegrador.service.SectionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

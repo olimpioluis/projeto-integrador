@@ -1,17 +1,13 @@
-package br.com.meli.projetointegrador;
+package br.com.meli.projetointegrador.service;
 
 import br.com.meli.projetointegrador.model.*;
 import br.com.meli.projetointegrador.repository.ProductRepository;
-import br.com.meli.projetointegrador.service.ProductService;
-import br.com.meli.projetointegrador.service.ProductServiceImpl;
-import br.com.meli.projetointegrador.service.SectionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
