@@ -3,6 +3,8 @@ package br.com.meli.projetointegrador.service;
 import br.com.meli.projetointegrador.exception.InexistentCartException;
 import br.com.meli.projetointegrador.model.Cart;
 import br.com.meli.projetointegrador.model.Item;
+import br.com.meli.projetointegrador.model.OrderStatus;
+import br.com.meli.projetointegrador.model.StatusCode;
 import br.com.meli.projetointegrador.repository.CartRepository;
 import br.com.meli.projetointegrador.validator.ProductExpirationDateGreaterThan3Weeks;
 import br.com.meli.projetointegrador.validator.ProductHasEnoughStock;
@@ -53,7 +55,21 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<Item> getOrderProducts(Long id) {
-        return findById(id).getItems();
+    public Cart updateCartToPurchase(Long id) {
+        Cart cart = findById(id);
+
+        List<Validator> validators = Arrays.asList(
+                new ProductExpirationDateGreaterThan3Weeks(cart.getItems(), batchService),
+                new ProductHasEnoughStock(productService, cart.getItems())
+        );
+
+        validators.forEach(Validator::validate);
+
+        cart.getOrderStatus().setStatusCode(StatusCode.PURCHASE);
+
+        batchService.takeOutProducts(cart.getItems());
+
+        return cart;
+
     }
 }
