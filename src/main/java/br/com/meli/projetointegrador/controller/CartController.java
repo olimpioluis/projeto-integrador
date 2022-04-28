@@ -1,8 +1,6 @@
 package br.com.meli.projetointegrador.controller;
 
-import br.com.meli.projetointegrador.dto.CartDTO;
-import br.com.meli.projetointegrador.dto.CartProductDTO;
-import br.com.meli.projetointegrador.dto.TotalCartPriceDTO;
+import br.com.meli.projetointegrador.dto.*;
 import br.com.meli.projetointegrador.service.AdvertisementService;
 import br.com.meli.projetointegrador.service.CartService;
 import br.com.meli.projetointegrador.service.CustomerService;
@@ -32,7 +30,12 @@ public class CartController {
     }
 
     @GetMapping("/{orderId}")
-    public ResponseEntity<List<CartProductDTO>> getOrderProducts(@PathVariable Long orderId) {
-        return new ResponseEntity<>(CartProductDTO.map(cartService.getOrderProducts(orderId)), HttpStatus.OK);
+    public ResponseEntity<CartWithStatusDTO> getOrderProducts(@PathVariable Long orderId) {
+        return new ResponseEntity<>(CartWithStatusDTO.map(cartService.findById(orderId)), HttpStatus.OK);
+    }
+
+    @PutMapping("/{orderId}")
+    public ResponseEntity<PurchaseCartDTO> putPurchaseOrder(@PathVariable Long orderId){
+        return new ResponseEntity<>(PurchaseCartDTO.map(cartService.updateCartToPurchase(orderId)), HttpStatus.OK);
     }
 }
