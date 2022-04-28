@@ -65,7 +65,7 @@ public class SectionServiceImpl implements SectionService {
 
         List<Batch> returnedList = filteredList.stream().sorted(expirationDateSorter).collect(Collectors.toList());
 
-        if (order.equals("des")) {
+        if (order.equals("desc")) {
             Collections.reverse(returnedList);
         }
 

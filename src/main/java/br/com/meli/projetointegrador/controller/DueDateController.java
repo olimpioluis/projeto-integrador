@@ -1,6 +1,5 @@
 package br.com.meli.projetointegrador.controller;
 
-import br.com.meli.projetointegrador.dto.BatchStockDTO;
 import br.com.meli.projetointegrador.dto.BatchStockDueDateDTO;
 import br.com.meli.projetointegrador.service.SectionService;
 import org.springframework.beans.factory.annotation.Autowired;
