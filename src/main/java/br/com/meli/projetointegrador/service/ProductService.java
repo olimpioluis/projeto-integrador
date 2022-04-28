@@ -11,4 +11,7 @@ public interface ProductService {
     List<ProductDTOi> findAllByBatchListExists();
 
     List<ProductDTOi> findAllByBatchListExistsBySection(String category);
+
+    Integer getTotalQuantity(Long id);
+
 }

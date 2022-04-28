@@ -8,12 +8,14 @@ import br.com.meli.projetointegrador.service.ProductService;
 import br.com.meli.projetointegrador.service.SectionService;
 import br.com.meli.projetointegrador.service.WarehouseService;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
+@Setter
 public class InboundOrderDTO {
 
     private Integer orderNumber;
@@ -30,7 +32,7 @@ public class InboundOrderDTO {
         return InboundOrder.builder()
                 .orderNumber(inboundOrderDTO.getOrderNumber())
                 .orderDate(inboundOrderDTO.getOrderDate())
-                .section(new Section(section.getId(), section.getName(), section.getCategory(), section.getSize(), warehouse, section.getBatchList()))
+                .section(new Section(section.getId(), section.getName(), section.getCategory(), section.getSize(), section.getCurrentSize(), warehouse, section.getBatchList()))
                 .batchList(batches)
                 .build();
     }

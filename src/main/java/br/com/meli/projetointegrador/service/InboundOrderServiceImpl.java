@@ -10,25 +10,30 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class InboundOrderServiceImpl implements InboundOrderService {
 
     private InboundOrderRepository inboundOrderRepository;
-    private BatchRepository batchRepository;
-    private SectionRepository sectionRepository;
-    private StockManagerRepository stockManagerRepository;
-    private WarehouseRepository warehouseRepository;
+    private BatchService batchService;
+    private SectionService sectionService;
+    private StockManagerService stockManagerService;
+    private WarehouseService warehouseService;
+
+
 
     @Override
     public List<Batch> save(InboundOrder inboundOrder) {
         List<Validator> validators = Arrays.asList(
-                new SectionAvailableSpace(sectionRepository, inboundOrder.getSection().getId(), inboundOrder),
-                new SectionExists(sectionRepository, inboundOrder.getSection().getId()),
-                new SectionMatchWithWarehouse(inboundOrder.getSection(),sectionRepository),
-//                new StockManagerNotInWarehouse(stockManagerRepository, inboundOrder.getStockManager().getId(), inboundOrder.getSection().getWarehouse().getId()),
-                new WarehouseExists(inboundOrder.getSection().getWarehouse().getId(), warehouseRepository)
+                new WarehouseExists(inboundOrder.getSection().getWarehouse().getId(), warehouseService),
+                new SectionExists(sectionService, inboundOrder.getSection().getId()),
+                new SectionAvailableSpace(sectionService, inboundOrder.getSection().getId(), inboundOrder.getBatchList()),
+                new SectionMatchWithWarehouse(inboundOrder.getSection(),sectionService)
+//                new StockManagerNotInWarehouse(stockManagerService, inboundOrder.getStockManager().getId(), inboundOrder.getSection().getWarehouse().getId()),
+
         );
 
         validators.forEach(Validator::validate);
@@ -37,14 +42,35 @@ public class InboundOrderServiceImpl implements InboundOrderService {
         InboundOrder orderCreated = inboundOrderRepository.save(inboundOrder);
 
         inboundOrder.getBatchList().forEach(batch -> batch.setInboundOrder(orderCreated));
+        List<Batch> batchesCreated = batchService.save(inboundOrder.getBatchList());
 
-        return batchRepository.saveAll(inboundOrder.getBatchList());
+        sectionService.updateCurrentSize(inboundOrder.getBatchList().size(), inboundOrder.getSection().getId(), false);
+
+        return batchesCreated;
     }
 
     @Override
-    public InboundOrder update(InboundOrder inboundOrder) {
-        InboundOrder inboundOrderExists = inboundOrderRepository.findById(inboundOrder.getId()).orElseThrow(() -> new InexistentInboundOrderException("Inboud Order" + inboundOrder.getId() + " does not exists!"));
+    public List<Batch> update(InboundOrder inboundOrder) {
+        List<Batch> newBatches = inboundOrder.getBatchList().stream().filter(batch -> Objects.isNull(batch.getId())).collect(Collectors.toList());
 
-        return inboundOrderRepository.save(inboundOrder);
+        List<Validator> validators = Arrays.asList(
+                new SectionAvailableSpace(sectionService, inboundOrder.getSection().getId(), newBatches)
+//                new StockManagerNotInWarehouse(stockManagerService, inboundOrder.getStockManager().getId(), inboundOrder.getSection().getWarehouse().getId()),
+        );
+
+        validators.forEach(Validator::validate);
+
+        inboundOrderRepository.save(inboundOrder);
+
+        List<Batch> batchesCreated = batchService.save(inboundOrder.getBatchList());
+
+        sectionService.updateCurrentSize(newBatches.size(), inboundOrder.getSection().getId(), false);
+
+        return batchesCreated;
+    }
+
+    @Override
+    public InboundOrder findById(Long id) {
+        return inboundOrderRepository.findById(id).orElseThrow(() -> new InexistentInboundOrderException("Inboud Order" + id + " does not exists!"));
     }
 }

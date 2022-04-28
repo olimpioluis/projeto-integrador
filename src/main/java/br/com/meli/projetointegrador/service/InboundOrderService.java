@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface InboundOrderService {
     List<Batch> save(InboundOrder inboundOrder);
-    InboundOrder update(InboundOrder inboundOrder);
+    List<Batch> update(InboundOrder inboundOrder);
+    InboundOrder findById(Long id);
 }
