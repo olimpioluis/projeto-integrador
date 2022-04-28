@@ -4,4 +4,5 @@ import br.com.meli.projetointegrador.model.Product;
 
 public interface ProductService {
     Product findById(Long id);
+    Integer getTotalQuantity(Long id);
 }

@@ -6,27 +6,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
-
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "advertisement")
-public class Advertisement {
+@Table(name = "order_status")
+public class OrderStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
-    private BigDecimal price;
-
-    @OneToOne
-    private Product product;
-
-    @ManyToOne
-    private Seller seller;
+    @Enumerated(EnumType.STRING)
+    private StatusCode statusCode;
 }

@@ -15,6 +15,12 @@ INSERT INTO seller (person_id) VALUES
 INSERT INTO seller (person_id) VALUES
 ((SELECT id from person WHERE name='Romaria'));
 
+/* Customers */
+INSERT INTO customer (person_id) VALUES
+((SELECT id from person WHERE name='Maria'));
+
+INSERT INTO customer (person_id) VALUES
+((SELECT id from person WHERE name='Romaria'));
 
 /* WareHouse */
 INSERT INTO warehouse (name) VALUES ('warehouse-sp');
