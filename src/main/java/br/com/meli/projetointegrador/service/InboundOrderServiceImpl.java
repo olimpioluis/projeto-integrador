@@ -18,21 +18,21 @@ import java.util.stream.Collectors;
 public class InboundOrderServiceImpl implements InboundOrderService {
 
     private InboundOrderRepository inboundOrderRepository;
-    private BatchRepository batchRepository;
-    private SectionRepository sectionRepository;
-    private StockManagerRepository stockManagerRepository;
-    private WarehouseRepository warehouseRepository;
-
+    private BatchService batchService;
     private SectionService sectionService;
+    private StockManagerService stockManagerService;
+    private WarehouseService warehouseService;
+
+
 
     @Override
     public List<Batch> save(InboundOrder inboundOrder) {
         List<Validator> validators = Arrays.asList(
-                new WarehouseExists(inboundOrder.getSection().getWarehouse().getId(), warehouseRepository),
-                new SectionExists(sectionRepository, inboundOrder.getSection().getId()),
-                new SectionAvailableSpace(sectionRepository, inboundOrder.getSection().getId(), inboundOrder.getBatchList()),
-                new SectionMatchWithWarehouse(inboundOrder.getSection(),sectionRepository)
-//                new StockManagerNotInWarehouse(stockManagerRepository, inboundOrder.getStockManager().getId(), inboundOrder.getSection().getWarehouse().getId()),
+                new WarehouseExists(inboundOrder.getSection().getWarehouse().getId(), warehouseService),
+                new SectionExists(sectionService, inboundOrder.getSection().getId()),
+                new SectionAvailableSpace(sectionService, inboundOrder.getSection().getId(), inboundOrder.getBatchList()),
+                new SectionMatchWithWarehouse(inboundOrder.getSection(),sectionService)
+//                new StockManagerNotInWarehouse(stockManagerService, inboundOrder.getStockManager().getId(), inboundOrder.getSection().getWarehouse().getId()),
 
         );
 
@@ -42,7 +42,7 @@ public class InboundOrderServiceImpl implements InboundOrderService {
         InboundOrder orderCreated = inboundOrderRepository.save(inboundOrder);
 
         inboundOrder.getBatchList().forEach(batch -> batch.setInboundOrder(orderCreated));
-        List<Batch> batchesCreated = batchRepository.saveAll(inboundOrder.getBatchList());
+        List<Batch> batchesCreated = batchService.save(inboundOrder.getBatchList());
 
         sectionService.updateCurrentSize(inboundOrder.getBatchList().size(), inboundOrder.getSection().getId());
 
@@ -54,15 +54,15 @@ public class InboundOrderServiceImpl implements InboundOrderService {
         List<Batch> newBatches = inboundOrder.getBatchList().stream().filter(batch -> Objects.isNull(batch.getId())).collect(Collectors.toList());
 
         List<Validator> validators = Arrays.asList(
-                new SectionAvailableSpace(sectionRepository, inboundOrder.getSection().getId(), newBatches)
-//                new StockManagerNotInWarehouse(stockManagerRepository, inboundOrder.getStockManager().getId(), inboundOrder.getSection().getWarehouse().getId()),
+                new SectionAvailableSpace(sectionService, inboundOrder.getSection().getId(), newBatches)
+//                new StockManagerNotInWarehouse(stockManagerService, inboundOrder.getStockManager().getId(), inboundOrder.getSection().getWarehouse().getId()),
         );
 
         validators.forEach(Validator::validate);
 
         inboundOrderRepository.save(inboundOrder);
 
-        List<Batch> batchesCreated = batchRepository.saveAll(inboundOrder.getBatchList());
+        List<Batch> batchesCreated = batchService.save(inboundOrder.getBatchList());
 
         sectionService.updateCurrentSize(newBatches.size(), inboundOrder.getSection().getId());
 

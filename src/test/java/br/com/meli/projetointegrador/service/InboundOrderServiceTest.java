@@ -24,21 +24,19 @@ public class InboundOrderServiceTest {
     @Mock
     private InboundOrderRepository inboundOrderRepository;
     @Mock
-    private BatchRepository batchRepository;
-    @Mock
-    private SectionRepository sectionRepository;
-    @Mock
-    private StockManagerRepository stockManagerRepository;
-    @Mock
-    private WarehouseRepository warehouseRepository;
+    private BatchService batchService;
     @Mock
     private SectionService sectionService;
+    @Mock
+    private StockManagerService stockManagerService;
+    @Mock
+    private WarehouseService warehouseService;
 
     @BeforeEach
     private void initializeInboundOrderService(){
-        MockitoAnnotations.openMocks(this);
-        this.inboundOrderService = new InboundOrderServiceImpl(inboundOrderRepository, batchRepository, sectionRepository, stockManagerRepository, warehouseRepository, sectionService);
-    }
+       MockitoAnnotations.openMocks(this);
+       this.inboundOrderService = new InboundOrderServiceImpl(inboundOrderRepository, batchService, sectionService, stockManagerService, warehouseService);
+   }
 
     private InboundOrder generateInboundOrder(){
         StockManager stockManagerIgor = new StockManager(1L, new Person(1L, "Igor", "123.456.789-10", "Igor@gmail.com", 'M'), new Warehouse());
@@ -79,9 +77,9 @@ public class InboundOrderServiceTest {
         InboundOrder inboundOrder = generateInboundOrder();
 
         Mockito.when(inboundOrderRepository.save(Mockito.any())).thenReturn(inboundOrder);
-        Mockito.when(batchRepository.saveAll(Mockito.any())).thenReturn(inboundOrder.getBatchList());
-        Mockito.when(sectionRepository.findById(Mockito.any())).thenReturn(Optional.of(inboundOrder.getSection()));
-        Mockito.when(warehouseRepository.findById(Mockito.any())).thenReturn(Optional.of(inboundOrder.getSection().getWarehouse()));
+        Mockito.when(batchService.save(Mockito.any())).thenReturn(inboundOrder.getBatchList());
+        Mockito.when(sectionService.findById(Mockito.any())).thenReturn(inboundOrder.getSection());
+        Mockito.when(warehouseService.findById(Mockito.any())).thenReturn(inboundOrder.getSection().getWarehouse());
 
         List<Batch> response = inboundOrderService.save(inboundOrder);
 
@@ -93,8 +91,8 @@ public class InboundOrderServiceTest {
         InboundOrder inboundOrder = generateInboundOrder();
 
         Mockito.when(inboundOrderRepository.save(Mockito.any())).thenReturn(inboundOrder);
-        Mockito.when(batchRepository.saveAll(Mockito.any())).thenReturn(inboundOrder.getBatchList());
-        Mockito.when(sectionRepository.findById(Mockito.any())).thenReturn(Optional.of(inboundOrder.getSection()));
+        Mockito.when(batchService.save(Mockito.any())).thenReturn(inboundOrder.getBatchList());
+        Mockito.when(sectionService.findById(Mockito.any())).thenReturn(inboundOrder.getSection());
 
 
         inboundOrder.getBatchList().get(0).setExpirationDate(LocalDate.of(2022, 6, 9));
@@ -122,8 +120,8 @@ public class InboundOrderServiceTest {
         inboundOrder.getSection().setCurrentSize(0);
 
         Mockito.when(inboundOrderRepository.save(Mockito.any())).thenReturn(inboundOrder);
-        Mockito.when(sectionRepository.findById(Mockito.any())).thenReturn(Optional.of(inboundOrder.getSection()));
-        Mockito.when(warehouseRepository.findById(Mockito.any())).thenReturn(Optional.of(inboundOrder.getSection().getWarehouse()));
+        Mockito.when(sectionService.findById(Mockito.any())).thenReturn(inboundOrder.getSection());
+        Mockito.when(warehouseService.findById(Mockito.any())).thenReturn(inboundOrder.getSection().getWarehouse());
 
         assertThrows(SectionUnavailableSpaceException.class, () -> inboundOrderService.save(inboundOrder));
 
@@ -133,8 +131,7 @@ public class InboundOrderServiceTest {
     public void WarehouseExistsValidatorTest(){
         InboundOrder inboundOrder = generateInboundOrder();
 
-        Mockito.when(inboundOrderRepository.save(Mockito.any())).thenReturn(inboundOrder);
-        Mockito.when(warehouseRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+        Mockito.when(warehouseService.findById(Mockito.any())).thenThrow(InexistentWarehouseException.class);
 
         assertThrows(InexistentWarehouseException.class, () -> inboundOrderService.save(inboundOrder));
 
@@ -144,9 +141,7 @@ public class InboundOrderServiceTest {
     public void SectionExistsValidatorTest(){
         InboundOrder inboundOrder = generateInboundOrder();
 
-        Mockito.when(inboundOrderRepository.save(Mockito.any())).thenReturn(inboundOrder);
-        Mockito.when(sectionRepository.findById(Mockito.any())).thenReturn(Optional.empty());
-        Mockito.when(warehouseRepository.findById(Mockito.any())).thenReturn(Optional.of(inboundOrder.getSection().getWarehouse()));
+        Mockito.when(sectionService.findById(Mockito.any())).thenThrow(InexistentSectionException.class);
 
         assertThrows(InexistentSectionException.class, () -> inboundOrderService.save(inboundOrder));
     }
@@ -158,8 +153,8 @@ public class InboundOrderServiceTest {
         Section section3 = new Section(3L, "Section 3", Category.FRESH, 6, 6, new Warehouse(), Collections.singletonList(new Batch()));
 
         Mockito.when(inboundOrderRepository.save(Mockito.any())).thenReturn(inboundOrder);
-        Mockito.when(sectionRepository.findById(Mockito.any())).thenReturn(Optional.of(section3));
-        Mockito.when(warehouseRepository.findById(Mockito.any())).thenReturn(Optional.of(inboundOrder.getSection().getWarehouse()));
+        Mockito.when(sectionService.findById(Mockito.any())).thenReturn(section3);
+        Mockito.when(warehouseService.findById(Mockito.any())).thenReturn(inboundOrder.getSection().getWarehouse());
 
         assertThrows(SectionNotMatchWithWarehouseException.class, () -> inboundOrderService.save(inboundOrder));
     }
@@ -171,8 +166,8 @@ public class InboundOrderServiceTest {
         inboundOrder.getSection().setCategory(Category.REFRIGERATED);
 
         Mockito.when(inboundOrderRepository.save(Mockito.any())).thenReturn(inboundOrder);
-        Mockito.when(sectionRepository.findById(Mockito.any())).thenReturn(Optional.of(inboundOrder.getSection()));
-        Mockito.when(warehouseRepository.findById(Mockito.any())).thenReturn(Optional.of(inboundOrder.getSection().getWarehouse()));
+        Mockito.when(sectionService.findById(Mockito.any())).thenReturn(inboundOrder.getSection());
+        Mockito.when(warehouseService.findById(Mockito.any())).thenReturn(inboundOrder.getSection().getWarehouse());
 
         assertThrows(SectionNotMatchWithBatchCategoryException.class, () -> inboundOrderService.save(inboundOrder));
     }
