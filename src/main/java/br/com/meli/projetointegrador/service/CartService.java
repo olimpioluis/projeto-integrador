@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface CartService {
     BigDecimal save(Cart cart);
-    List<Item> getOrderProducts(Long id);
+    Cart updateCartToPurchase(Long id);
     Cart findById(Long id);
 }
