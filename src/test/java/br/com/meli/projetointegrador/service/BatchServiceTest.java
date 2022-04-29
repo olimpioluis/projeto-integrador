@@ -1,5 +1,7 @@
 package br.com.meli.projetointegrador.service;
 
+import br.com.meli.projetointegrador.exception.InexistentBatchException;
+import br.com.meli.projetointegrador.exception.InexistentInboundOrderException;
 import br.com.meli.projetointegrador.model.Batch;
 import br.com.meli.projetointegrador.model.InboundOrder;
 import br.com.meli.projetointegrador.model.Product;
@@ -14,8 +16,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BatchServiceTest {
     private BatchServiceImpl batchService;
@@ -55,6 +59,13 @@ public class BatchServiceTest {
         Mockito.when(batchRepository.findById(Mockito.any())).thenReturn(java.util.Optional.of(batches.get(0)));
 
         assertEquals(batches.get(0), batchService.findById(1L));
+    }
+
+    @Test
+    public void inexistentBatchExceptionTest(){
+        Mockito.when(batchRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+
+        assertThrows(InexistentBatchException.class, () -> batchService.findById(1L));
     }
 
 
