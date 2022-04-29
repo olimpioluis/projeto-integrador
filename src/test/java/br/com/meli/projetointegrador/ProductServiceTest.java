@@ -1,6 +1,7 @@
 package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.model.*;
+import br.com.meli.projetointegrador.repository.BatchRepository;
 import br.com.meli.projetointegrador.repository.ProductRepository;
 import br.com.meli.projetointegrador.service.ProductService;
 import br.com.meli.projetointegrador.service.ProductServiceImpl;
@@ -23,10 +24,12 @@ public class ProductServiceTest {
     @Mock
     private ProductRepository productRepository;
 
+    private BatchRepository batchRepository;
+
     @BeforeEach
     private void initializeProductService() {
         MockitoAnnotations.openMocks(this);
-        this.productService = new ProductServiceImpl(productRepository);
+        this.productService = new ProductServiceImpl(productRepository, batchRepository);
     }
 
     @Test
