@@ -17,7 +17,7 @@ class ExampleController {
     }
 
 
-    @GetMapping("/customer/<username>")
+    @GetMapping("/customer")
     @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public String customerAccess() {
         return "Customer Board.";
