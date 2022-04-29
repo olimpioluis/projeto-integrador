@@ -7,10 +7,12 @@ import br.com.meli.projetointegrador.repository.BatchRepository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -26,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class InboundOrderIntegrationTests {
 
     @Autowired
@@ -36,6 +39,8 @@ public class InboundOrderIntegrationTests {
 
     @Autowired
     private BatchRepository batchRepository;
+
+    private static boolean init = false;
 
 
     private String getStandardInboundOrder() {
@@ -98,13 +103,22 @@ public class InboundOrderIntegrationTests {
         return response.getResponse().getContentAsString();
     }
 
+    @BeforeEach
+    void initialSetup() throws Exception {
+
+        if (!init) {
+            String inboundOrderString = getStandardInboundOrder();
+            InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
+
+            postInboundOrder(inboundOrderDTO, status().isCreated());
+            init = true;
+        }
+
+    }
+
     @Test
     void registerValidInboundOrder() throws Exception {
 
-        String inboundOrderString = getStandardInboundOrder();
-        InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
-
-        postInboundOrder(inboundOrderDTO, status().isCreated());
         Batch batch = batchRepository.findBySectionId(6L);
 
         assertAll(
@@ -117,11 +131,11 @@ public class InboundOrderIntegrationTests {
     @Test
     void updateValidInboundOrder() throws Exception {
 
-        String inboundOrderString = getStandardUpdateInboundOrder();
-        InboundOrderPutDTO inboundOrderPutDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
+        String inboundOrderUpdateString = getStandardUpdateInboundOrder();
+        InboundOrderPutDTO inboundOrderPutDTO = objectMapper.readValue(inboundOrderUpdateString, new TypeReference<>() {});
 
         putInboundOrder(inboundOrderPutDTO, status().isCreated());
-        Batch batch = batchRepository.findBySectionId(6L);
+        Batch batch = batchRepository.findById(inboundOrderPutDTO.getBatchStock().get(0).getId()).orElse(new Batch());
 
         assertEquals(LocalDate.of(2022, 11, 9), batch.getManufacturingDate());
 
