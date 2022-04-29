@@ -1,10 +1,7 @@
 package br.com.meli.projetointegrador;
 
 
-import br.com.meli.projetointegrador.dto.BatchStockDTO;
-import br.com.meli.projetointegrador.dto.ErrorDTO;
-import br.com.meli.projetointegrador.dto.InboundOrderDTO;
-import br.com.meli.projetointegrador.dto.SectionDTO;
+import br.com.meli.projetointegrador.dto.*;
 import br.com.meli.projetointegrador.model.Batch;
 import br.com.meli.projetointegrador.repository.BatchRepository;
 
@@ -18,9 +15,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -62,11 +61,37 @@ public class InboundOrderIntegrationTests {
                 "}";
     }
 
+    private String getStandardUpdateInboundOrder(){
+        return "{\n" +
+                "    \"inboundOrderId\": 1,\n" +
+                "    \"orderDate\": \"2022-01-10\",\n" +
+                "    \"batchStock\": [\n" +
+                "        {\n" +
+                "            \"id\": 1,\n" +
+                "            \"manufacturingDate\": \"2022-11-09\",\n" +
+                "            \"manufacturingTime\": \"2022-11-09T00:00:00\",\n" +
+                "            \"expirationDate\": \"2022-11-15\"\n" +
+                "        }\n" +
+                "    ]\n" +
+                "}";
+    }
+
     private String postInboundOrder(InboundOrderDTO inboundOrderDTO, ResultMatcher resultMatcher) throws Exception {
 
         MvcResult response = mockmvc.perform(post("/api/v1/fresh-products/inboundorder")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(inboundOrderDTO)))
+                .andExpect(resultMatcher)
+                .andReturn();
+
+        return response.getResponse().getContentAsString();
+    }
+
+    private String putInboundOrder(InboundOrderPutDTO inboundOrderPutDTO, ResultMatcher resultMatcher) throws Exception {
+
+        MvcResult response = mockmvc.perform(put("/api/v1/fresh-products/inboundorder")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(inboundOrderPutDTO)))
                 .andExpect(resultMatcher)
                 .andReturn();
 
@@ -86,6 +111,19 @@ public class InboundOrderIntegrationTests {
                 () -> assertEquals(25.5, batch.getCurrentTemperature()),
                 () -> assertEquals(20, batch.getInitialQuantity())
         );
+
+    }
+
+    @Test
+    void updateValidInboundOrder() throws Exception {
+
+        String inboundOrderString = getStandardUpdateInboundOrder();
+        InboundOrderPutDTO inboundOrderPutDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
+
+        putInboundOrder(inboundOrderPutDTO, status().isCreated());
+        Batch batch = batchRepository.findBySectionId(6L);
+
+        assertEquals(LocalDate.of(2022, 11, 9), batch.getManufacturingDate());
 
     }
 

@@ -64,4 +64,10 @@ public class GeneralExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InexistentStockManagerException.class)
+    protected ResponseEntity<ErrorDTO> handleInexistentStockManagerException(InexistentStockManagerException ex){
+        ErrorDTO error = new ErrorDTO("InexistentStockManagerException", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
 }
