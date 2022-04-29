@@ -5,15 +5,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 public interface ProductByBatchResponse {
-    Long getId();
+    BigInteger getId();
+    Double getHeight();
     String getName();
     Double getPrice();
     Double getWidth();
-    Double getHeight();
-    Long getBatchId();
-    LocalDate getExpirationDate();
-    Long getCurrentQuantity();
+    BigInteger getBatchId();
+    String getExpirationDate();
+    Integer getCurrentQuantity();
 }
