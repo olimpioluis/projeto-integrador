@@ -31,7 +31,7 @@ public class DueDateIntegrationTests {
 
     private String getStandardInboundOrder() {
         return "{\n" +
-                "    \"orderNumber\": 2,\n" +
+                "    \"orderNumber\": 10,\n" +
                 "    \"orderDate\": \"2022-04-27\",\n" +
                 "    \"section\": {\n" +
                 "        \"sectionCode\": 3,\n" +

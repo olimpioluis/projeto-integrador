@@ -63,11 +63,11 @@ public class InboundOrderIntegrationTests {
 
     private String getStandardUpdateInboundOrder(){
         return "{\n" +
-                "    \"inboundOrderId\": 1,\n" +
+                "    \"inboundOrderId\": 2,\n" +
                 "    \"orderDate\": \"2022-01-10\",\n" +
                 "    \"batchStock\": [\n" +
                 "        {\n" +
-                "            \"id\": 1,\n" +
+                "            \"id\": 5,\n" +
                 "            \"manufacturingDate\": \"2022-11-09\",\n" +
                 "            \"manufacturingTime\": \"2022-11-09T00:00:00\",\n" +
                 "            \"expirationDate\": \"2022-11-15\"\n" +
