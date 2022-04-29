@@ -1,5 +1,6 @@
 package br.com.meli.projetointegrador.service;
 
+import br.com.meli.projetointegrador.exception.InexistentProductException;
 import br.com.meli.projetointegrador.model.*;
 import br.com.meli.projetointegrador.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,9 +9,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ProductServiceTest {
 
@@ -27,10 +30,16 @@ public class ProductServiceTest {
 
     @Test
     public void findByIdTest() {
-        Mockito.when(productRepository.findById(1L))
-                .thenReturn(java.util.Optional.of(new Product(1L, "Product 1", 20.0, 2.0, 2.0, Arrays.asList(new Batch()))));
-        Product product = productRepository.findById(1L).orElse(new Product());
+        Mockito.when(productRepository.findById(Mockito.any()))
+                .thenReturn(java.util.Optional.of(new Product(1L, "Product 1", 20.0, 2.0, 2.0, Collections.singletonList(new Batch()))));
 
-        assertEquals("Product 1", product.getName());
+        assertEquals("Product 1", productService.findById(1L).getName());
+    }
+
+    @Test
+    public void inexistentProductException(){
+        Mockito.when(productRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+
+        assertThrows(InexistentProductException.class, () -> productService.findById(1L));
     }
 }
