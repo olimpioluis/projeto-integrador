@@ -39,11 +39,12 @@ public class StockManagerServiceTest {
     }
 
     @Test
-    public void inexistentStockManagerException(){
+    public void inexistentStockManagerExceptionTest(){
         Mockito.when(stockManagerRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
         assertThrows(InexistentStockManagerException.class, () -> stockManagerService.findById(1L));
     }
+
 
 
 
