@@ -22,5 +22,5 @@ public class Warehouse {
     private List<StockManager> stockManagerList = new ArrayList<StockManager>();
 
     @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL)
-    private List<Sector> sectorList = new ArrayList<Sector>();
+    private List<Section> sectionList = new ArrayList<Section>();
 }

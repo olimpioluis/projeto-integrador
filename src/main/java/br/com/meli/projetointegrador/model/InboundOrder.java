@@ -11,6 +11,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 @Table(name="inbound_order")
 public class InboundOrder {
@@ -18,10 +19,14 @@ public class InboundOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Integer orderNumber;
     private LocalDate orderDate;
 
+    @ManyToOne
+    private Section section;
+
     @OneToMany(mappedBy = "inboundOrder", cascade = CascadeType.ALL)
-    private List<Batch> batchList = new ArrayList<Batch>();
+    private List<Batch> batchList = new ArrayList<>();
 
     @ManyToOne
     private StockManager stockManager;

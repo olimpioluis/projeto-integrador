@@ -12,20 +12,24 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="sector")
-public class Sector {
+@Table(name="section")
+public class Section {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String category;
-    private Double size;
+
+    @Enumerated(EnumType.STRING)
+    private Category category;
+    private Integer size;
+    private Integer currentSize;
+
 
     @ManyToOne
     private Warehouse warehouse;
 
-    @OneToMany(mappedBy = "sector",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "section",cascade = CascadeType.ALL)
     private List<Batch> batchList;
 }
 
