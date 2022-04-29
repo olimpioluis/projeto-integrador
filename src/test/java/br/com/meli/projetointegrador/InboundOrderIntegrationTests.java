@@ -67,7 +67,7 @@ public class InboundOrderIntegrationTests {
                 "    \"orderDate\": \"2022-01-10\",\n" +
                 "    \"batchStock\": [\n" +
                 "        {\n" +
-                "            \"id\": 5,\n" +
+                "            \"id\": 1,\n" +
                 "            \"manufacturingDate\": \"2022-11-09\",\n" +
                 "            \"manufacturingTime\": \"2022-11-09T00:00:00\",\n" +
                 "            \"expirationDate\": \"2022-11-15\"\n" +
@@ -121,7 +121,7 @@ public class InboundOrderIntegrationTests {
         InboundOrderPutDTO inboundOrderPutDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
 
         putInboundOrder(inboundOrderPutDTO, status().isCreated());
-        Batch batch = batchRepository.findBySectionId(6L);
+        Batch batch = batchRepository.findById(inboundOrderPutDTO.getBatchStock().get(0).getId()).orElse(new Batch());
 
         assertEquals(LocalDate.of(2022, 11, 9), batch.getManufacturingDate());
 
