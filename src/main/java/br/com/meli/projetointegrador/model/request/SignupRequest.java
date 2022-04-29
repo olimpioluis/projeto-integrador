@@ -33,7 +33,7 @@ public class SignupRequest {
   private String password;
 
 
-  private Integer warehouse_id;
+  private Long warehouse_id;
 
 
 }

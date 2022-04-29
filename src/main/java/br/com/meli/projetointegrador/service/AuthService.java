@@ -1,19 +1,14 @@
 package br.com.meli.projetointegrador.service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import br.com.meli.projetointegrador.model.ERole;
-import br.com.meli.projetointegrador.model.Role;
-import br.com.meli.projetointegrador.model.User;
+import br.com.meli.projetointegrador.exception.InexistentWarehouseException;
+import br.com.meli.projetointegrador.model.*;
 import br.com.meli.projetointegrador.model.request.LoginRequest;
 import br.com.meli.projetointegrador.model.request.SignupRequest;
 import br.com.meli.projetointegrador.model.response.JwtResponse;
 import br.com.meli.projetointegrador.model.response.MessageResponse;
-import br.com.meli.projetointegrador.repository.RoleRepository;
-import br.com.meli.projetointegrador.repository.UserRepository;
+import br.com.meli.projetointegrador.repository.*;
 import br.com.meli.projetointegrador.security.jwt.JwtUtils;
 import br.com.meli.projetointegrador.security.services.UserDetailsImpl;
 
@@ -39,6 +34,18 @@ public class AuthService {
 
     @Autowired
     RoleRepository roleRepository;
+
+    @Autowired
+    SellerRepository sellerRepository;
+
+    @Autowired
+    WarehouseRepository warehouseRepository;
+
+    @Autowired
+    StockManagerRepository stockManagerRepository;
+
+    @Autowired
+    CustomerRepository customerRepository;
 
     @Autowired
     PasswordEncoder encoder;
@@ -103,21 +110,30 @@ public class AuthService {
             strRoles.forEach(role -> {
                 switch (role) {
                     case "manager":
-                        Role stockManager = roleRepository.findByName(ERole.ROLE_STOCK_MANAGER)
+                        Role stockManagerRole = roleRepository.findByName(ERole.ROLE_STOCK_MANAGER)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(stockManager);
+                        roles.add(stockManagerRole);
+                        Warehouse warehouse = warehouseRepository.findById(signUpRequest.getWarehouse_id())
+                                .orElseThrow(() -> new InexistentWarehouseException("The informed Warehouse does not exist!") );
 
+                        StockManager stockManager = new StockManager(user, warehouse);
+                        stockManagerRepository.save(stockManager);
                         break;
+
                     case "seller":
                         Role sellerRole = roleRepository.findByName(ERole.ROLE_SELLER)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(sellerRole);
-
+                        Seller seller = new Seller(user);
+                        sellerRepository.save(seller);
                         break;
+
                     default:
                         Role customerRole = roleRepository.findByName(ERole.ROLE_CUSTOMER)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(customerRole);
+                        Customer customer = new Customer(user);
+                        customerRepository.save(customer);
                 }
             });
         }
