@@ -24,4 +24,9 @@ public class StockManager {
 
     @ManyToOne
     private Warehouse warehouse;
+
+    public StockManager(User user, Warehouse warehouse) {
+        this.user = user;
+        this.warehouse = warehouse;
+    }
 }

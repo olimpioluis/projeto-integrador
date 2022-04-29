@@ -21,5 +21,7 @@ public class Customer {
     @OneToOne(cascade = CascadeType.ALL)
     private User user;
 
-
+    public Customer(User user) {
+        this.user = user;
+    }
 }
