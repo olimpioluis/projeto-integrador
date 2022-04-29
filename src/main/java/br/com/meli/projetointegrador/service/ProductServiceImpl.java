@@ -31,13 +31,12 @@ public class ProductServiceImpl implements ProductService {
 
         switch (orderBy) {
             case "L":
-                return batchRepository.getAllProductThatHaveBatch(id, "batchId");
+                return batchRepository.getAllProductThatHaveBatch(id);
             case "C":
-                batchRepository.getAllProductThatHaveBatch(id, "currentQuantity");
+                return batchRepository.getAllProductThatHaveBatchQuantity(id);
             case "F":
-                return batchRepository.getAllProductThatHaveBatch(id, "expirationDate");
+                return batchRepository.getAllProductThatHaveBatchExpiration(id);
             default:
-                // throw exception
                 return productByBatchResponseList;
         }
 
