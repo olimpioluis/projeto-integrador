@@ -4,10 +4,12 @@ import br.com.meli.projetointegrador.dto.BatchStockDueDateDTO;
 import br.com.meli.projetointegrador.dto.InboundOrderDTO;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -21,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class DueDateIntegrationTests {
 
     @Autowired
@@ -28,6 +31,8 @@ public class DueDateIntegrationTests {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    private static boolean init = false;
 
     private String getStandardInboundOrder() {
         return "{\n" +
@@ -105,13 +110,20 @@ public class DueDateIntegrationTests {
         return response.getResponse().getContentAsString();
     }
 
+    @BeforeEach
+    void initialSetup() throws Exception {
+
+        if (!init) {
+            String inboundOrderString = getStandardInboundOrder();
+            InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
+
+            postInboundOrder(inboundOrderDTO, status().isCreated());
+            init = true;
+        }
+    }
+
     @Test
     void getBatchStockByDueDate() throws Exception {
-
-        String inboundOrderString = getStandardInboundOrder();
-        InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
-
-        postInboundOrder(inboundOrderDTO, status().isCreated());
 
         String checkBatchStockDueDate = getCheckBatchStockDueDate("64", "1",status().isOk());
 
