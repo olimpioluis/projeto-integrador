@@ -4,6 +4,7 @@ import br.com.meli.projetointegrador.exception.NotFoundProductException;
 import br.com.meli.projetointegrador.repository.BatchRepository;
 import br.com.meli.projetointegrador.service.BatchService;
 import br.com.meli.projetointegrador.service.BatchServiceImpl;
+import br.com.meli.projetointegrador.service.SectionService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,10 +25,13 @@ public class BatchServiceTest {
     @Mock
     private BatchRepository batchRepository;
 
+    @Mock
+    private SectionService sectionService;
+
     @BeforeEach
     void initConfig() {
         MockitoAnnotations.openMocks(this);
-        this.batchService = new BatchServiceImpl(batchRepository);
+        this.batchService = new BatchServiceImpl(batchRepository, sectionService);
     }
 
     @Test

@@ -70,4 +70,34 @@ public class GeneralExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InexistentStockManagerException.class)
+    protected ResponseEntity<ErrorDTO> handleInexistentStockManagerException(InexistentStockManagerException ex) {
+        ErrorDTO error = new ErrorDTO("InexistentStockManagerException", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InexistentAdvertisementException.class)
+    protected ResponseEntity<ErrorDTO> handleInexistentAdvertisementException(InexistentAdvertisementException ex){
+        ErrorDTO error = new ErrorDTO("InexistentAdvertisementException", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InexistentCustomerException.class)
+    protected ResponseEntity<ErrorDTO> handleInexistentCustomerException(InexistentCustomerException ex){
+        ErrorDTO error = new ErrorDTO("InexistentCustomerException", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ProductHasNotBatchesAvailableToPurchaseException.class)
+    protected ResponseEntity<ErrorDTO> handleProductHasNotBatchesAvailableToPurchase(ProductHasNotBatchesAvailableToPurchaseException ex){
+        ErrorDTO error = new ErrorDTO("ProductHasNotBatchesAvailableToPurchase", "The following items has not enough stock to purchase: " + ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ProductHasNotEnoughStockException.class)
+    protected ResponseEntity<ErrorDTO> handleProductHasNotEnoughStockException(ProductHasNotEnoughStockException ex){
+        ErrorDTO error = new ErrorDTO("ProductHasNotEnoughStockException", "The following items has not enough stock to purchase: " + ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
 }
