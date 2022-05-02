@@ -28,6 +28,12 @@ public class GeneralExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(NotFoundProductException.class)
+    protected ResponseEntity<ErrorDTO> handleNotFoundProductException(NotFoundProductException ex){
+        ErrorDTO error = new ErrorDTO("NotFoundProductException", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(InexistentSectionException.class)
     protected ResponseEntity<ErrorDTO> handleInexistentSectionException(InexistentSectionException ex){
         ErrorDTO error = new ErrorDTO("InexistentSectionException", ex.getMessage());

@@ -1,16 +1,17 @@
 package br.com.meli.projetointegrador.service;
 
 import br.com.meli.projetointegrador.exception.InexistentBatchException;
+import br.com.meli.projetointegrador.exception.NotFoundProductException;
 import br.com.meli.projetointegrador.model.Batch;
 import br.com.meli.projetointegrador.model.Item;
 import br.com.meli.projetointegrador.repository.BatchRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
-import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -32,6 +33,15 @@ public class BatchServiceImpl implements BatchService {
     }
 
     @Override
+    public List<Object[]> getBatchStockByWarehouse(Long productId) {
+        List<Object[]> result = batchRepository.groupAllByWarehouseId(productId);
+
+        if (result.size() == 0) {
+            throw new NotFoundProductException("The Product ID: " + productId + " does not exists!");
+        }
+        return result;
+    }
+
     public List<Batch> getBatchesWithExpirationDateGreaterThan3Weeks(Long productId) {
         List<Batch> batches = findAllBatchesByProduct(productId);
 
@@ -76,6 +86,5 @@ public class BatchServiceImpl implements BatchService {
             decreaseBatch(batches, item.getQuantity());
         });
     }
-
 
 }
