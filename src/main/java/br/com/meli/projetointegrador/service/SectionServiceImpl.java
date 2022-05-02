@@ -27,11 +27,15 @@ public class SectionServiceImpl implements SectionService {
     }
 
     @Override
-    public void updateCurrentSize(Integer amountUsed, Long id) {
-        Section section = findById(id);
+    public void updateCurrentSize(Integer amount, Long sectionId, boolean operation) {
+        Section section = findById(sectionId);
 
-        section.setCurrentSize(section.getCurrentSize() - amountUsed);
-
+        if(operation){
+            section.setCurrentSize(section.getCurrentSize() + amount);
+        }
+        else{
+            section.setCurrentSize(section.getCurrentSize() - amount);
+        }
         sectionRepository.save(section);
     }
 

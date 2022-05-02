@@ -44,7 +44,7 @@ public class InboundOrderServiceImpl implements InboundOrderService {
         inboundOrder.getBatchList().forEach(batch -> batch.setInboundOrder(orderCreated));
         List<Batch> batchesCreated = batchService.save(inboundOrder.getBatchList());
 
-        sectionService.updateCurrentSize(inboundOrder.getBatchList().size(), inboundOrder.getSection().getId());
+        sectionService.updateCurrentSize(inboundOrder.getBatchList().size(), inboundOrder.getSection().getId(), false);
 
         return batchesCreated;
     }
@@ -64,7 +64,7 @@ public class InboundOrderServiceImpl implements InboundOrderService {
 
         List<Batch> batchesCreated = batchService.save(inboundOrder.getBatchList());
 
-        sectionService.updateCurrentSize(newBatches.size(), inboundOrder.getSection().getId());
+        sectionService.updateCurrentSize(newBatches.size(), inboundOrder.getSection().getId(), false);
 
         return batchesCreated;
     }

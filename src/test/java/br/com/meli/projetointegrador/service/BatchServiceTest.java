@@ -26,11 +26,13 @@ public class BatchServiceTest {
 
     @Mock
     private BatchRepository batchRepository;
+    @Mock
+    private  SectionService sectionService;
 
     @BeforeEach
     private void initializeBatchService() {
         MockitoAnnotations.openMocks(this);
-        this.batchService = new BatchServiceImpl(batchRepository);
+        this.batchService = new BatchServiceImpl(batchRepository, sectionService);
     }
 
     private List<Batch> generateBatches(){
