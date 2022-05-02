@@ -39,8 +39,8 @@ public class InboundOrderServiceTest {
    }
 
     private InboundOrder generateInboundOrder(){
-        StockManager stockManagerIgor = new StockManager(1L, new Person(1L, "Igor", "123.456.789-10", "Igor@gmail.com", 'M'), new Warehouse());
-        StockManager stockManagerJederson = new StockManager(2L, new Person(2L, "Jederson", "103.476.729-30", "jederson@gmail.com", 'M'),new Warehouse());
+        StockManager stockManagerIgor = new StockManager(1L, new User(1L, "Igor", "123.456.789-10", "igor@gmail.com"), new Warehouse());
+        StockManager stockManagerJederson = new StockManager(2L, new User(2L, "Jederson", "103.476.729-30", "jederson@gmail.com"), new Warehouse());
 
         Warehouse warehouse = new Warehouse(1L,"Warehouse 1", Arrays.asList(stockManagerIgor, stockManagerJederson), Collections.singletonList(new Section()));
 

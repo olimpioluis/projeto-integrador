@@ -46,6 +46,14 @@ public class User {
             this.username = username;
             this.password = encode;
     }
+
+    public User(Long id, String name, String cpf, String email) {
+        this.id = id;
+        this.name = name;
+        this.cpf = cpf;
+        this.email = email;
+    }
+
     public User() {
     }
 
