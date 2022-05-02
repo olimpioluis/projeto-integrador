@@ -6,26 +6,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Car {
+@Table(name = "order_status")
+public class OrderStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    private Customer customer;
-
-    private Double totalCar;
-
-
-    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
-    private List<Item> list;
-
+    @Enumerated(EnumType.STRING)
+    private StatusCode statusCode;
 }

@@ -1,13 +1,11 @@
-package br.com.meli.projetointegrador;
+package br.com.meli.projetointegrador.service;
 
 import br.com.meli.projetointegrador.dto.ProductByBatchResponse;
 import br.com.meli.projetointegrador.dto.ProductByBatchResponseImpl;
+import br.com.meli.projetointegrador.exception.InexistentProductException;
 import br.com.meli.projetointegrador.model.*;
 import br.com.meli.projetointegrador.repository.BatchRepository;
 import br.com.meli.projetointegrador.repository.ProductRepository;
-import br.com.meli.projetointegrador.service.ProductService;
-import br.com.meli.projetointegrador.service.ProductServiceImpl;
-import br.com.meli.projetointegrador.service.SectionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -15,13 +13,15 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 public class ProductServiceTest {
 
@@ -29,6 +29,8 @@ public class ProductServiceTest {
 
     @Mock
     private ProductRepository productRepository;
+    @Mock
+    private BatchService batchService;
 
     @Mock
     private BatchRepository batchRepository;
@@ -36,16 +38,22 @@ public class ProductServiceTest {
     @BeforeEach
     private void initializeProductService() {
         MockitoAnnotations.openMocks(this);
-        this.productService = new ProductServiceImpl(productRepository, batchRepository);
+        this.productService = new ProductServiceImpl(productRepository, batchRepository, batchService);
     }
 
     @Test
     public void findByIdTest() {
-        Mockito.when(productRepository.findById(1L))
-                .thenReturn(java.util.Optional.of(new Product(1L, "Product 1", 20.0, 2.0, 2.0, Arrays.asList(new Batch()))));
-        Product product = productRepository.findById(1L).orElse(new Product());
+        Mockito.when(productRepository.findById(Mockito.any()))
+                .thenReturn(java.util.Optional.of(new Product(1L, "Product 1", 20.0, 2.0, 2.0, Collections.singletonList(new Batch()))));
 
-        assertEquals("Product 1", product.getName());
+        assertEquals("Product 1", productService.findById(1L).getName());
+    }
+
+    @Test
+    public void inexistentProductException(){
+        Mockito.when(productRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+
+        assertThrows(InexistentProductException.class, () -> productService.findById(1L));
     }
 
     @Test

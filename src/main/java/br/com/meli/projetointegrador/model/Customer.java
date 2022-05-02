@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,4 +25,5 @@ public class Customer {
     public Customer(User user) {
         this.user = user;
     }
+
 }

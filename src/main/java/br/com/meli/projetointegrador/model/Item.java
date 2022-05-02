@@ -6,13 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.*;
+
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 public class Item {
 
@@ -24,7 +25,7 @@ public class Item {
     private Advertisement advertisement;
 
     @ManyToOne
-    private Car car;
+    private Cart cart;
 
     private Integer quantity;
 
