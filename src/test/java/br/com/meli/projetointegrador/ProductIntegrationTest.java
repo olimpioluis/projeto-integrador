@@ -3,10 +3,13 @@ package br.com.meli.projetointegrador;
 import br.com.meli.projetointegrador.dto.BatchStockDTO;
 import br.com.meli.projetointegrador.dto.InboundOrderDTO;
 import br.com.meli.projetointegrador.dto.ProductDTOi;
+import br.com.meli.projetointegrador.dto.ProductDTOiImpl;
 import br.com.meli.projetointegrador.model.Product;
 import br.com.meli.projetointegrador.repository.ProductRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -77,19 +80,47 @@ public class ProductIntegrationTest {
 
         return response.getResponse().getContentAsString();
     }
+    private String getAllProductByCategory() throws Exception {
 
+        MvcResult response = mockmvc.perform(get("/api/v1/fresh-products/list/").param("category","FR"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        return response.getResponse().getContentAsString();
+    }
+
+
+    @BeforeEach
+    void initialSetup() throws Exception {
+
+        String inboundOrderString = getStandardInboundOrder();
+        InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {
+        });
+
+        postInboundOrder(inboundOrderDTO, status().isCreated());
+    }
 
     @Test
-    void NonexistentProductList() throws Exception {
+    void existentProductList() throws Exception {
 
         List<ProductDTOi> productDTOis = productRepository.findAllByBatchListExists();
 
-        List<ProductDTOi> productDTOiList = objectMapper.readValue(getAllProduct(), new TypeReference<>() {
+        List<ProductDTOiImpl> productDTOiList = objectMapper.readValue(getAllProduct(), new TypeReference<>() {
         });
 
-        int propertyListSize = productDTOiList.size();
+        assertEquals(productDTOis.size(), productDTOiList.size());
 
-        assertEquals(productDTOis.size(), propertyListSize);
+    }
+
+    @Test
+    void validProductListByCategory() throws Exception {
+
+        List<ProductDTOi> productDTOis = productRepository.findAllByBatchListExistsBySection("FROZEN");
+
+        List<ProductDTOi> productDTOiList = objectMapper.readValue(getAllProductByCategory(), new TypeReference<>() {
+        });
+
+        assertEquals(productDTOis.size(), productDTOiList.size());
 
     }
 
