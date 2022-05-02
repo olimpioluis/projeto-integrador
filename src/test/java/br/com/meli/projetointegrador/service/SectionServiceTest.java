@@ -114,7 +114,7 @@ public class SectionServiceTest {
         Mockito.when(sectionRepository.save(Mockito.any()))
                 .thenReturn(section);
 
-        sectionService.updateCurrentSize(2, 1L);
+        sectionService.updateCurrentSize(2, 1L, false);
 
         assertEquals(8, section.getCurrentSize());
 

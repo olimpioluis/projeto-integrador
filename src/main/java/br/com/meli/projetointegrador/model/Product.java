@@ -1,7 +1,6 @@
 package br.com.meli.projetointegrador.model;
 
 import lombok.*;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import javax.persistence.*;
 import java.util.ArrayList;
