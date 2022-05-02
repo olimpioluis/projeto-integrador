@@ -5,6 +5,8 @@ import br.com.meli.projetointegrador.dto.CartWithStatusDTO;
 import br.com.meli.projetointegrador.dto.InboundOrderDTO;
 
 import br.com.meli.projetointegrador.model.Cart;
+import br.com.meli.projetointegrador.model.request.LoginRequest;
+import br.com.meli.projetointegrador.model.response.JwtResponse;
 import br.com.meli.projetointegrador.repository.CartRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +40,7 @@ public class CartIntegrationTest {
     private CartRepository cartRepository;
 
     private static boolean init = false;
+    private static String jwt = "";
 
     private String getStandardInboundOrder() {
         return "{\n" +
@@ -112,6 +115,39 @@ public class CartIntegrationTest {
                 "}";
     }
 
+    public String signUpStockManagerBody() {
+        return "{\n" +
+                "    \"name\" : \"usertest\",\n" +
+                "    \"username\" : \"usertest\",\n" +
+                "    \"email\" : \"usertest@teste.com.br\",\n" +
+                "    \"cpf\" : \"000-000-000-01\",\n" +
+                "    \"password\" : \"abcd1234\",\n" +
+                "    \"warehouse_id\": 1,\n" +
+                "    \"role\" : [\"manager\", \"customer\"]\n" +
+                "}";
+    }
+
+    public void signUpPost(ResultMatcher resultMatcher) throws Exception {
+
+        String signUpDTO = signUpStockManagerBody();
+        mockmvc.perform(post("/api/auth/signup")
+                .contentType("application/json")
+                .content(signUpDTO))
+                .andExpect(resultMatcher);
+
+    }
+
+    public String signInPost(LoginRequest loginRequest, ResultMatcher resultMatcher) throws Exception {
+
+        MvcResult result = mockmvc.perform(post("/api/auth/signin")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(resultMatcher).andReturn();
+
+        return result.getResponse().getContentAsString();
+
+    }
+
     private String postInboundOrder(InboundOrderDTO inboundOrderDTO, ResultMatcher resultMatcher) throws Exception {
 
         MvcResult response = mockmvc.perform(post("/api/v1/fresh-products/inboundorder")
@@ -149,6 +185,13 @@ public class CartIntegrationTest {
     void initialSetup() throws Exception {
 
         if (!init) {
+
+            signUpPost(status().isOk());
+            LoginRequest loginBody = new LoginRequest("usertest", "abcd1234");
+            String signInResponse = signInPost(loginBody, status().isOk());
+            JwtResponse jwtResponse = objectMapper.readValue(signInResponse, new TypeReference<>() {});
+            jwt = jwtResponse.getToken();
+
             String inboundOrderString = getStandardInboundOrder();
             String purchaseOrderString = postPurchaseOrder();
             CartDTO cartDTO = objectMapper.readValue(purchaseOrderString, new TypeReference<CartDTO>() {
