@@ -171,4 +171,11 @@ public class InboundOrderServiceTest {
 
         assertThrows(SectionNotMatchWithBatchCategoryException.class, () -> inboundOrderService.save(inboundOrder));
     }
+
+    @Test
+    public void inexistentInboundOrderException(){
+        Mockito.when(inboundOrderRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+
+        assertThrows(InexistentInboundOrderException.class, () -> inboundOrderService.findById(1L));
+    }
 }

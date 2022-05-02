@@ -117,8 +117,7 @@ public class ProductIntegrationTest {
 
         List<ProductDTOi> productDTOis = productRepository.findAllByBatchListExistsBySection("FROZEN");
 
-        List<ProductDTOi> productDTOiList = objectMapper.readValue(getAllProductByCategory(), new TypeReference<>() {
-        });
+        List<ProductDTOiImpl> productDTOiList = objectMapper.readValue(getAllProductByCategory(), new TypeReference<>() {  });
 
         assertEquals(productDTOis.size(), productDTOiList.size());
 
