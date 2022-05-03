@@ -6,4 +6,6 @@ public interface StockManagerService {
 
     StockManager findById (Long id);
 
+    StockManager findByUserUsername(String username);
+
 }

@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StockManagerRepository extends JpaRepository<StockManager, Long> {
+    StockManager findByUserUsername(String username);
+
 }

@@ -17,4 +17,9 @@ public class StockManagerServiceImpl implements StockManagerService{
         return stockManagerRepository.findById(id).orElseThrow(() -> new InexistentStockManagerException("Stock Manager "+ id + " does not exists!"));
     }
 
+    @Override
+    public StockManager findByUserUsername(String userName) {
+        return stockManagerRepository.findByUserUsername(userName);
+    }
+
 }
