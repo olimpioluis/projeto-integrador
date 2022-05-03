@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import br.com.meli.projetointegrador.dto.ProductDTOi;
 import br.com.meli.projetointegrador.model.Category;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,6 +31,7 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/product")
+    @PreAuthorize("hasRole('ROLE_STOCK_MANAGER')")
     public ResponseEntity<List<ProductByBatchResponse>> getProductById(@RequestParam(name = "productId") Long productId,
                                                                        @RequestParam(name = "orderBy", required = false, defaultValue = "L") String orderBy) {
 
@@ -40,6 +42,7 @@ public class ProductController {
      * Método responsável por listar os produtos do repositorio
      */
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public List<ProductDTOi> productListAll() {
         return productService.findAllByBatchListExists();
     }
@@ -48,6 +51,7 @@ public class ProductController {
      * Método responsável por listar os produtos do repositorio por categoria
      */
     @GetMapping("/list")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public List<ProductDTOi> productListAllByCategory(@RequestParam String category) {
         Category category1;
         switch (category){

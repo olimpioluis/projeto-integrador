@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class CartIntegrationTest {
 
     @Autowired
@@ -40,7 +42,8 @@ public class CartIntegrationTest {
     private CartRepository cartRepository;
 
     private static boolean init = false;
-    private static String jwt = "";
+    private static String CUSTOMER_JWT = "";
+    private static String STOCK_MANAGER_JWT = "";
 
     private String getStandardInboundOrder() {
         return "{\n" +
@@ -115,21 +118,31 @@ public class CartIntegrationTest {
                 "}";
     }
 
-    public String signUpStockManagerBody() {
+    public String signUpCustomerBody() {
         return "{\n" +
-                "    \"name\" : \"usertest\",\n" +
-                "    \"username\" : \"usertest\",\n" +
-                "    \"email\" : \"usertest@teste.com.br\",\n" +
-                "    \"cpf\" : \"000-000-000-01\",\n" +
+                "    \"name\" : \"customertest\",\n" +
+                "    \"username\" : \"customertest\",\n" +
+                "    \"email\" : \"customertest@teste.com.br\",\n" +
+                "    \"cpf\" : \"000-000-000-03\",\n" +
                 "    \"password\" : \"abcd1234\",\n" +
-                "    \"warehouse_id\": 1,\n" +
-                "    \"role\" : [\"manager\", \"customer\"]\n" +
+                "    \"role\" : [\"customer\"]\n" +
                 "}";
     }
 
-    public void signUpPost(ResultMatcher resultMatcher) throws Exception {
+    public String signUpStockManagerBody() {
+        return "{\n" +
+                "    \"name\" : \"stockmanagertest\",\n" +
+                "    \"username\" : \"stockmanagertest\",\n" +
+                "    \"email\" : \"stockmanagertest@teste.com.br\",\n" +
+                "    \"cpf\" : \"000-000-000-01\",\n" +
+                "    \"password\" : \"abcd1234\",\n" +
+                "    \"warehouse_id\": 1,\n" +
+                "    \"role\" : [\"manager\"]\n" +
+                "}";
+    }
 
-        String signUpDTO = signUpStockManagerBody();
+    public void signUpPost(ResultMatcher resultMatcher, String signUpDTO) throws Exception {
+
         mockmvc.perform(post("/api/auth/signup")
                 .contentType("application/json")
                 .content(signUpDTO))
@@ -148,35 +161,46 @@ public class CartIntegrationTest {
 
     }
 
-    private String postInboundOrder(InboundOrderDTO inboundOrderDTO, ResultMatcher resultMatcher) throws Exception {
+    private String postInboundOrder(InboundOrderDTO inboundOrderDTO, ResultMatcher resultMatcher, String jwt) throws Exception {
 
         MvcResult response = mockmvc.perform(post("/api/v1/fresh-products/inboundorder")
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwt)
                 .content(objectMapper.writeValueAsString(inboundOrderDTO)))
                 .andExpect(resultMatcher)
                 .andReturn();
 
         return response.getResponse().getContentAsString();
     }
-    private String postPurchaseOrder(CartDTO cartDTO, ResultMatcher resultMatcher) throws Exception {
+
+    private String postPurchaseOrder(CartDTO cartDTO, ResultMatcher resultMatcher, String jwt) throws Exception {
 
         MvcResult response = mockmvc.perform(post("/api/v1/fresh-products/orders")
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwt)
                 .content(objectMapper.writeValueAsString(cartDTO)))
                 .andExpect(resultMatcher)
                 .andReturn();
 
         return response.getResponse().getContentAsString();
     }
-    private String putPurchaseOrder() throws Exception {
 
-        MvcResult response = mockmvc.perform(put("/api/v1/fresh-products/orders/1")).andReturn();
+    private String putPurchaseOrder(ResultMatcher resultMatcher, String jwt) throws Exception {
+
+        MvcResult response = mockmvc.perform(put("/api/v1/fresh-products/orders/1")
+                .header("Authorization", "Bearer " + jwt))
+                .andExpect(resultMatcher)
+                .andReturn();
 
         return response.getResponse().getContentAsString();
     }
-    private String getPurchaseOrder() throws Exception {
 
-        MvcResult response = mockmvc.perform(get("/api/v1/fresh-products/orders/1")).andReturn();
+    private String getPurchaseOrder(ResultMatcher resultMatcher, String jwt) throws Exception {
+
+        MvcResult response = mockmvc.perform(get("/api/v1/fresh-products/orders/1")
+                .header("Authorization", "Bearer " + jwt))
+                .andExpect(resultMatcher)
+                .andReturn();
 
         return response.getResponse().getContentAsString();
     }
@@ -186,11 +210,23 @@ public class CartIntegrationTest {
 
         if (!init) {
 
-            signUpPost(status().isOk());
-            LoginRequest loginBody = new LoginRequest("usertest", "abcd1234");
+            String signUpDTOCustomer = signUpCustomerBody();
+            signUpPost(status().isOk(), signUpDTOCustomer);
+
+            String signUpDTOStockManager = signUpStockManagerBody();
+            signUpPost(status().isOk(), signUpDTOStockManager);
+
+            LoginRequest loginBody = new LoginRequest("customertest", "abcd1234");
             String signInResponse = signInPost(loginBody, status().isOk());
-            JwtResponse jwtResponse = objectMapper.readValue(signInResponse, new TypeReference<>() {});
-            jwt = jwtResponse.getToken();
+            JwtResponse jwtResponse = objectMapper.readValue(signInResponse, new TypeReference<>() {
+            });
+            CUSTOMER_JWT = jwtResponse.getToken();
+
+            loginBody = new LoginRequest("stockmanagertest", "abcd1234");
+            signInResponse = signInPost(loginBody, status().isOk());
+            jwtResponse = objectMapper.readValue(signInResponse, new TypeReference<>() {
+            });
+            STOCK_MANAGER_JWT = jwtResponse.getToken();
 
             String inboundOrderString = getStandardInboundOrder();
             String purchaseOrderString = postPurchaseOrder();
@@ -200,8 +236,8 @@ public class CartIntegrationTest {
             InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {
             });
 
-            postInboundOrder(inboundOrderDTO, status().isCreated());
-            postPurchaseOrder(cartDTO, status().isCreated());
+            postInboundOrder(inboundOrderDTO, status().isCreated(), STOCK_MANAGER_JWT);
+            postPurchaseOrder(cartDTO, status().isCreated(), CUSTOMER_JWT);
             init = true;
         }
     }
@@ -232,7 +268,7 @@ public class CartIntegrationTest {
     @Test
     void updatePurchaseOrder() throws Exception {
 
-        putPurchaseOrder();
+        putPurchaseOrder(status().isOk(), CUSTOMER_JWT);
         Cart cart = cartRepository.findById(1L).orElse(new Cart());
 
         assertEquals("PURCHASE", cart.getOrderStatus().getStatusCode().name());
@@ -242,7 +278,8 @@ public class CartIntegrationTest {
     @Test
     void validPurchaseOrder() throws  Exception{
 
-        CartWithStatusDTO cartWithStatusDTO = objectMapper.readValue(getPurchaseOrder(), new TypeReference<CartWithStatusDTO>() {
+        CartWithStatusDTO cartWithStatusDTO = objectMapper.readValue(getPurchaseOrder(status().isOk(), CUSTOMER_JWT),
+                new TypeReference<CartWithStatusDTO>() {
         });
 
         Cart cart = cartRepository.findById(1L).orElse(new Cart());
