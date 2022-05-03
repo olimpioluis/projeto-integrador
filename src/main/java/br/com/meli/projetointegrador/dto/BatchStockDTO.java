@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,13 +17,21 @@ import java.util.stream.Collectors;
 @Setter
 @AllArgsConstructor
 public class BatchStockDTO {
+    @NotNull(message = "ProductId missing.")
     private Long productId;
+    @NotNull(message = "CurrentTemperature missing.")
     private Double currentTemperature;
+    @NotNull(message = "MinTemperature missing.")
     private Double minTemperature;
+    @NotNull(message = "InitialQuantity missing.")
     private Integer initialQuantity;
+    @NotNull(message = "CurrentQuantity missing.")
     private Integer currentQuantity;
+    @NotNull(message = "ManufacturingDate missing.")
     private LocalDate manufacturingDate;
+    @NotNull(message = "ManufacturingTime missing.")
     private LocalDateTime manufacturingTime;
+    @NotNull(message = "ExpirationDate missing.")
     private LocalDate expirationDate;
 
     public static Batch map(BatchStockDTO batchStockDTO, ProductService productService, Section section) {

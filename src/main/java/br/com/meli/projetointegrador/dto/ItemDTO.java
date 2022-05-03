@@ -5,10 +5,14 @@ import br.com.meli.projetointegrador.model.Item;
 import br.com.meli.projetointegrador.service.AdvertisementService;
 import lombok.Getter;
 
+import javax.validation.constraints.NotNull;
+
 @Getter
 public class ItemDTO {
 
+    @NotNull(message = "advertisementId missing.")
     private Long advertisementId;
+    @NotNull(message = "Quantity missing.")
     private Integer quantity;
 
     public static Item map(ItemDTO itemDTO, AdvertisementService advertisementService) {

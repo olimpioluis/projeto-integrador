@@ -10,6 +10,8 @@ import br.com.meli.projetointegrador.service.WarehouseService;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,10 +20,15 @@ import java.util.stream.Collectors;
 @Setter
 public class InboundOrderDTO {
 
+    @NotNull(message = "OrderNumber missing.")
     private Integer orderNumber;
+    @NotNull(message = "OrderDate missing.")
     private LocalDate orderDate;
+    @Valid
+    @NotNull(message = "Section missing.")
     private SectionDTO section;
-    private List<BatchStockDTO> batchStock;
+    @NotNull(message = "BatchStock missing.")
+    private List<@Valid BatchStockDTO> batchStock;
 
     public static InboundOrder map(InboundOrderDTO inboundOrderDTO, SectionService sectionService, ProductService productService, WarehouseService warehouseService) {
         Section section = sectionService.findById(inboundOrderDTO.getSection().getSectionCode());
