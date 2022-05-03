@@ -45,14 +45,17 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
     public List<Product> findAll(){
         return productRepository.findAll();
     }
 
+    @Override
     public List<ProductDTOi> findAllByBatchListExists() {
         return productRepository.findAllByBatchListExists();
     }
 
+    @Override
     public List<ProductDTOi> findAllByBatchListExistsBySection(String category) {
         return productRepository.findAllByBatchListExistsBySection(category);
     }
