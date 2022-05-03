@@ -1,10 +1,14 @@
 package br.com.meli.projetointegrador.controller;
 
-import br.com.meli.projetointegrador.dto.ProductDTOi;
-import br.com.meli.projetointegrador.model.Category;
-import br.com.meli.projetointegrador.service.BatchService;
+import br.com.meli.projetointegrador.dto.ProductByBatchResponse;
 import br.com.meli.projetointegrador.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import br.com.meli.projetointegrador.dto.ProductDTOi;
+import br.com.meli.projetointegrador.model.Category;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,10 +30,19 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    @GetMapping("/product")
+    @PreAuthorize("hasRole('ROLE_STOCK_MANAGER')")
+    public ResponseEntity<List<ProductByBatchResponse>> getProductById(@RequestParam(name = "productId") Long productId,
+                                                                       @RequestParam(name = "orderBy", required = false, defaultValue = "L") String orderBy) {
+
+        return new ResponseEntity<>(productService.getAllProductThatHaveBatch(productId, orderBy), HttpStatus.OK);
+    }
+
     /**
      * Método responsável por listar os produtos do repositorio
      */
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public List<ProductDTOi> productListAll() {
         return productService.findAllByBatchListExists();
     }
@@ -38,6 +51,7 @@ public class ProductController {
      * Método responsável por listar os produtos do repositorio por categoria
      */
     @GetMapping("/list")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public List<ProductDTOi> productListAllByCategory(@RequestParam String category) {
         Category category1;
         switch (category){
@@ -50,4 +64,5 @@ public class ProductController {
         }
         return productService.findAllByBatchListExistsBySection(category1.toString());
     }
+
 }

@@ -1,0 +1,38 @@
+package br.com.meli.projetointegrador.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.data.rest.configuration.SpringDataRestConfiguration;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+@Configuration
+@EnableSwagger2
+@Import({SpringDataRestConfiguration.class, BeanValidatorPluginsConfiguration.class})
+public class SpringFoxConfig {
+
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("br.com.meli.projetointegrador.controller"))
+                .paths(PathSelectors.any())
+                .build()
+                .apiInfo(metaData());
+    }
+
+    private ApiInfo metaData() {
+        return new ApiInfoBuilder()
+                .title("Integrative Project - Wave 5 | Two Factor Group")
+                .description("\"Spring Boot REST API to handle Mercado Livre fresh products\"")
+                .version("1.0.0")
+                .build();
+    }
+}

@@ -21,9 +21,12 @@ public class Seller {
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
-    private Person person;
+    private User user;
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
     private List<Advertisement> advertisementList = new ArrayList<Advertisement>();
 
+    public Seller(User user) {
+        this.user = user;
+    }
 }

@@ -1,9 +1,12 @@
 package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.dto.*;
+import br.com.meli.projetointegrador.model.request.LoginRequest;
+import br.com.meli.projetointegrador.model.response.JwtResponse;
 import br.com.meli.projetointegrador.repository.BatchRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -36,6 +39,11 @@ public class WarehouseIntegrationTests {
 
     @Autowired
     private BatchRepository batchRepository;
+
+    private static boolean init = false;
+    private static String STOCK_MANAGER_JWT = "";
+    private static String SELLER_JWT = "";
+    private static String CUSTOMER_JWT = "";
 
     private String getStandardInboundOrder() {
         return "{\n" +
@@ -80,10 +88,65 @@ public class WarehouseIntegrationTests {
                 "}";
     }
 
-    private String postInboundOrder(InboundOrderDTO inboundOrderDTO, ResultMatcher resultMatcher) throws Exception {
+    public String signUpStockManagerBody() {
+        return "{\n" +
+                "    \"name\" : \"stockmanagertest\",\n" +
+                "    \"username\" : \"stockmanagertest\",\n" +
+                "    \"email\" : \"stockmanagertest@teste.com.br\",\n" +
+                "    \"cpf\" : \"000-000-000-01\",\n" +
+                "    \"password\" : \"abcd1234\",\n" +
+                "    \"warehouse_id\": 1,\n" +
+                "    \"role\" : [\"manager\"]\n" +
+                "}";
+    }
+
+    public String signUpSellerBody() {
+        return "{\n" +
+                "    \"name\" : \"sellertest\",\n" +
+                "    \"username\" : \"sellertest\",\n" +
+                "    \"email\" : \"sellertest@teste.com.br\",\n" +
+                "    \"cpf\" : \"000-000-000-02\",\n" +
+                "    \"password\" : \"abcd1234\",\n" +
+                "    \"role\" : [\"seller\"]\n" +
+                "}";
+    }
+
+    public String signUpCustomerBody() {
+        return "{\n" +
+                "    \"name\" : \"customertest\",\n" +
+                "    \"username\" : \"customertest\",\n" +
+                "    \"email\" : \"customertest@teste.com.br\",\n" +
+                "    \"cpf\" : \"000-000-000-03\",\n" +
+                "    \"password\" : \"abcd1234\",\n" +
+                "    \"role\" : [\"customer\"]\n" +
+                "}";
+    }
+
+    public void signUpPost(ResultMatcher resultMatcher, String signUpDTO) throws Exception {
+
+        mockmvc.perform(post("/api/auth/signup")
+                .contentType("application/json")
+                .content(signUpDTO))
+                .andExpect(resultMatcher);
+
+    }
+
+    public String signInPost(LoginRequest loginRequest, ResultMatcher resultMatcher) throws Exception {
+
+        MvcResult result = mockmvc.perform(post("/api/auth/signin")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(resultMatcher).andReturn();
+
+        return result.getResponse().getContentAsString();
+
+    }
+
+    private String postInboundOrder(InboundOrderDTO inboundOrderDTO, ResultMatcher resultMatcher, String jwt) throws Exception {
 
         MvcResult response = mockmvc.perform(post("/api/v1/fresh-products/inboundorder")
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwt)
                 .content(objectMapper.writeValueAsString(inboundOrderDTO)))
                 .andExpect(resultMatcher)
                 .andReturn();
@@ -91,9 +154,10 @@ public class WarehouseIntegrationTests {
         return response.getResponse().getContentAsString();
     }
 
-    private String getProductsByWarehouse(Long productId, ResultMatcher resultMatcher) throws Exception{
+    private String getProductsByWarehouse(Long productId, ResultMatcher resultMatcher, String jwt) throws Exception{
         MvcResult result = mockmvc.perform(get("/api/v1/fresh-products/warehouse")
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwt)
                 .param("productId", String.valueOf(productId)))
                 .andExpect(resultMatcher)
                 .andReturn();
@@ -101,12 +165,42 @@ public class WarehouseIntegrationTests {
         return result.getResponse().getContentAsString();
     }
 
+    @BeforeEach
+    void initialSetup() throws Exception {
+        if (!init) {
+            String signUpDTOStockManager = signUpStockManagerBody();
+            signUpPost(status().isOk(), signUpDTOStockManager);
+
+            String signUpDTOSeller = signUpSellerBody();
+            signUpPost(status().isOk(), signUpDTOSeller);
+
+            String signUpDTOCustomer = signUpCustomerBody();
+            signUpPost(status().isOk(), signUpDTOCustomer);
+
+            LoginRequest loginBody = new LoginRequest("stockmanagertest", "abcd1234");
+            String signInResponse = signInPost(loginBody, status().isOk());
+            JwtResponse jwtResponse = objectMapper.readValue(signInResponse, new TypeReference<>() {});
+            STOCK_MANAGER_JWT = jwtResponse.getToken();
+
+            loginBody = new LoginRequest("sellertest", "abcd1234");
+            signInResponse = signInPost(loginBody, status().isOk());
+            jwtResponse = objectMapper.readValue(signInResponse, new TypeReference<>() {});
+            SELLER_JWT = jwtResponse.getToken();
+
+            loginBody = new LoginRequest("customertest", "abcd1234");
+            signInResponse = signInPost(loginBody, status().isOk());
+            jwtResponse = objectMapper.readValue(signInResponse, new TypeReference<>() {});
+            CUSTOMER_JWT = jwtResponse.getToken();
+
+            init = true;
+        }
+    }
 
     @Test
     void getValidProductStockByWarehouse() throws Exception {
         String inboundOrderString = getStandardInboundOrder();
         InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
-        postInboundOrder(inboundOrderDTO, status().isCreated());
+        postInboundOrder(inboundOrderDTO, status().isCreated(), STOCK_MANAGER_JWT);
 
 
         SectionDTO inboundSectionDto = inboundOrderDTO.getSection();
@@ -120,10 +214,10 @@ public class WarehouseIntegrationTests {
         batchStockDTOList.add(batchStockDTO);
 
         inboundOrderDTO.setBatchStock(batchStockDTOList);
-        postInboundOrder(inboundOrderDTO, status().isCreated());
+        postInboundOrder(inboundOrderDTO, status().isCreated(), STOCK_MANAGER_JWT);
 
 
-        String resultStr = getProductsByWarehouse(1L, status().isOk());
+        String resultStr = getProductsByWarehouse(1L, status().isOk(), STOCK_MANAGER_JWT);
         ProductStockWarehouseDTO productByWarehouse = objectMapper.readValue(resultStr, new TypeReference<>() {});
 
 
@@ -135,7 +229,7 @@ public class WarehouseIntegrationTests {
         assertEquals(productByWarehouse.getQuantityByWarehouseList().toString(), productByWarehouseTest.getQuantityByWarehouseList().toString());
 
 
-        resultStr = getProductsByWarehouse(2L, status().isOk());
+        resultStr = getProductsByWarehouse(2L, status().isOk(), STOCK_MANAGER_JWT);
         productByWarehouse = objectMapper.readValue(resultStr, new TypeReference<>() {});
 
         quantityByWarehouseDTOList = Arrays.asList(new QuantityByWarehouseDTO(BigDecimal.valueOf(60), BigInteger.valueOf(1)),
@@ -147,7 +241,9 @@ public class WarehouseIntegrationTests {
 
     @Test
     void getInvalidProductStockByWarehouse() throws Exception {
-        String resultStr = getProductsByWarehouse(333L, status().isNotFound());
+        getProductsByWarehouse(333L, status().isForbidden(), CUSTOMER_JWT);
+        getProductsByWarehouse(333L, status().isForbidden(), SELLER_JWT);
+        String resultStr = getProductsByWarehouse(333L, status().isNotFound(), STOCK_MANAGER_JWT);
         ErrorDTO errorDTO = objectMapper.readValue(resultStr, new TypeReference<>() {});
 
         assertEquals("The Product ID: 333 does not exists!", errorDTO.getDescription());
