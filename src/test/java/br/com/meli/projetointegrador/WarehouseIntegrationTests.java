@@ -42,6 +42,7 @@ public class WarehouseIntegrationTests {
 
     private static boolean init = false;
     private static String STOCK_MANAGER_JWT = "";
+    private static String SELLER_JWT = "";
     private static String CUSTOMER_JWT = "";
 
     private String getStandardInboundOrder() {
@@ -99,14 +100,24 @@ public class WarehouseIntegrationTests {
                 "}";
     }
 
+    public String signUpSellerBody() {
+        return "{\n" +
+                "    \"name\" : \"sellertest\",\n" +
+                "    \"username\" : \"sellertest\",\n" +
+                "    \"email\" : \"sellertest@teste.com.br\",\n" +
+                "    \"cpf\" : \"000-000-000-02\",\n" +
+                "    \"password\" : \"abcd1234\",\n" +
+                "    \"role\" : [\"seller\"]\n" +
+                "}";
+    }
+
     public String signUpCustomerBody() {
         return "{\n" +
                 "    \"name\" : \"customertest\",\n" +
                 "    \"username\" : \"customertest\",\n" +
                 "    \"email\" : \"customertest@teste.com.br\",\n" +
-                "    \"cpf\" : \"000-000-000-02\",\n" +
+                "    \"cpf\" : \"000-000-000-03\",\n" +
                 "    \"password\" : \"abcd1234\",\n" +
-                "    \"warehouse_id\": 1,\n" +
                 "    \"role\" : [\"customer\"]\n" +
                 "}";
     }
@@ -160,6 +171,9 @@ public class WarehouseIntegrationTests {
             String signUpDTOStockManager = signUpStockManagerBody();
             signUpPost(status().isOk(), signUpDTOStockManager);
 
+            String signUpDTOSeller = signUpSellerBody();
+            signUpPost(status().isOk(), signUpDTOSeller);
+
             String signUpDTOCustomer = signUpCustomerBody();
             signUpPost(status().isOk(), signUpDTOCustomer);
 
@@ -167,6 +181,11 @@ public class WarehouseIntegrationTests {
             String signInResponse = signInPost(loginBody, status().isOk());
             JwtResponse jwtResponse = objectMapper.readValue(signInResponse, new TypeReference<>() {});
             STOCK_MANAGER_JWT = jwtResponse.getToken();
+
+            loginBody = new LoginRequest("sellertest", "abcd1234");
+            signInResponse = signInPost(loginBody, status().isOk());
+            jwtResponse = objectMapper.readValue(signInResponse, new TypeReference<>() {});
+            SELLER_JWT = jwtResponse.getToken();
 
             loginBody = new LoginRequest("customertest", "abcd1234");
             signInResponse = signInPost(loginBody, status().isOk());
@@ -223,6 +242,7 @@ public class WarehouseIntegrationTests {
     @Test
     void getInvalidProductStockByWarehouse() throws Exception {
         getProductsByWarehouse(333L, status().isForbidden(), CUSTOMER_JWT);
+        getProductsByWarehouse(333L, status().isForbidden(), SELLER_JWT);
         String resultStr = getProductsByWarehouse(333L, status().isNotFound(), STOCK_MANAGER_JWT);
         ErrorDTO errorDTO = objectMapper.readValue(resultStr, new TypeReference<>() {});
 
