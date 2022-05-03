@@ -1,9 +1,12 @@
 package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.dto.*;
+import br.com.meli.projetointegrador.model.request.LoginRequest;
+import br.com.meli.projetointegrador.model.response.JwtResponse;
 import br.com.meli.projetointegrador.repository.BatchRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -36,6 +39,9 @@ public class WarehouseIntegrationTests {
 
     @Autowired
     private BatchRepository batchRepository;
+
+    private static boolean init = false;
+    private static String jwt = "";
 
     private String getStandardInboundOrder() {
         return "{\n" +
@@ -80,10 +86,44 @@ public class WarehouseIntegrationTests {
                 "}";
     }
 
+    public String signUpStockManagerBody() {
+        return "{\n" +
+                "    \"name\" : \"usertest\",\n" +
+                "    \"username\" : \"usertest\",\n" +
+                "    \"email\" : \"usertest@teste.com.br\",\n" +
+                "    \"cpf\" : \"000-000-000-01\",\n" +
+                "    \"password\" : \"abcd1234\",\n" +
+                "    \"warehouse_id\": 1,\n" +
+                "    \"role\" : [\"manager\"]\n" +
+                "}";
+    }
+
+    public void signUpPost(ResultMatcher resultMatcher) throws Exception {
+
+        String signUpDTO = signUpStockManagerBody();
+        mockmvc.perform(post("/api/auth/signup")
+                .contentType("application/json")
+                .content(signUpDTO))
+                .andExpect(resultMatcher);
+
+    }
+
+    public String signInPost(LoginRequest loginRequest, ResultMatcher resultMatcher) throws Exception {
+
+        MvcResult result = mockmvc.perform(post("/api/auth/signin")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(resultMatcher).andReturn();
+
+        return result.getResponse().getContentAsString();
+
+    }
+
     private String postInboundOrder(InboundOrderDTO inboundOrderDTO, ResultMatcher resultMatcher) throws Exception {
 
         MvcResult response = mockmvc.perform(post("/api/v1/fresh-products/inboundorder")
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwt)
                 .content(objectMapper.writeValueAsString(inboundOrderDTO)))
                 .andExpect(resultMatcher)
                 .andReturn();
@@ -94,6 +134,7 @@ public class WarehouseIntegrationTests {
     private String getProductsByWarehouse(Long productId, ResultMatcher resultMatcher) throws Exception{
         MvcResult result = mockmvc.perform(get("/api/v1/fresh-products/warehouse")
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwt)
                 .param("productId", String.valueOf(productId)))
                 .andExpect(resultMatcher)
                 .andReturn();
@@ -101,6 +142,17 @@ public class WarehouseIntegrationTests {
         return result.getResponse().getContentAsString();
     }
 
+    @BeforeEach
+    void initialSetup() throws Exception {
+        if (!init) {
+            signUpPost(status().isOk());
+            LoginRequest loginBody = new LoginRequest("usertest", "abcd1234");
+            String signInResponse = signInPost(loginBody, status().isOk());
+            JwtResponse jwtResponse = objectMapper.readValue(signInResponse, new TypeReference<>() {});
+            jwt = jwtResponse.getToken();
+            init = true;
+        }
+    }
 
     @Test
     void getValidProductStockByWarehouse() throws Exception {
