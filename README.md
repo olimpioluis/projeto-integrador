@@ -35,10 +35,12 @@ Quality and safety).
 You run it using the ```java -jar``` or the ```mvn spring-boot:run``` commands.
 
 * Clone this repository 
+* Create a db with docker-compose
 * Make sure you are using JDK 1.8 and Maven 3.x
 * You can build the project and run the tests by running ```mvn clean package```
 * Once successfully built, you can run the service by one of these two methods:
 ```
+       docker-compose up 
        mvn spring-boot:run 
 ```
 * Check the stdout on your console to view logs, exceptions  and more 
