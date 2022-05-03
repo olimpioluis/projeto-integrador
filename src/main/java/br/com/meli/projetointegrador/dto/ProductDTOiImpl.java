@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class ProductDTOiImpl {
+public class ProductDTOiImpl implements ProductDTOi {
     private Long id;
     private String name;
-    private Double price;
+    private int quantity;
 }

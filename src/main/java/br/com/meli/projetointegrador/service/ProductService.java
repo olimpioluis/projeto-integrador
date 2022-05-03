@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface ProductService {
     Product findById(Long id);
+
     List<ProductByBatchResponse> getAllProductThatHaveBatch(Long id, String orderBy);
 
     List<ProductDTOi> findAllByBatchListExists();
@@ -15,5 +16,7 @@ public interface ProductService {
     List<ProductDTOi> findAllByBatchListExistsBySection(String category);
 
     Integer getTotalQuantity(Long id);
+
+    public List<Product> findAll();
 
 }
