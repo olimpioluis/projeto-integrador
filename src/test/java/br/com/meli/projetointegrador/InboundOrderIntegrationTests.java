@@ -3,6 +3,8 @@ package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.dto.*;
 import br.com.meli.projetointegrador.model.Batch;
+import br.com.meli.projetointegrador.model.request.LoginRequest;
+import br.com.meli.projetointegrador.model.response.JwtResponse;
 import br.com.meli.projetointegrador.repository.BatchRepository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -42,6 +44,7 @@ public class InboundOrderIntegrationTests {
     private BatchRepository batchRepository;
 
     private static boolean init = false;
+    private static String STOCK_MANAGER_JWT = "";
 
 
     private String getStandardInboundOrder() {
@@ -82,10 +85,43 @@ public class InboundOrderIntegrationTests {
                 "}";
     }
 
-    private String postInboundOrder(InboundOrderDTO inboundOrderDTO, ResultMatcher resultMatcher) throws Exception {
+    public String signUpStockManagerBody() {
+        return "{\n" +
+                "    \"name\" : \"stockmanagertest\",\n" +
+                "    \"username\" : \"stockmanagertest\",\n" +
+                "    \"email\" : \"stockmanagertest@teste.com.br\",\n" +
+                "    \"cpf\" : \"000-000-000-01\",\n" +
+                "    \"password\" : \"abcd1234\",\n" +
+                "    \"warehouse_id\": 1,\n" +
+                "    \"role\" : [\"manager\"]\n" +
+                "}";
+    }
+
+    public void signUpPost(ResultMatcher resultMatcher, String signUpDTO) throws Exception {
+
+        mockmvc.perform(post("/api/auth/signup")
+                .contentType("application/json")
+                .content(signUpDTO))
+                .andExpect(resultMatcher);
+
+    }
+
+    public String signInPost(LoginRequest loginRequest, ResultMatcher resultMatcher) throws Exception {
+
+        MvcResult result = mockmvc.perform(post("/api/auth/signin")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(resultMatcher).andReturn();
+
+        return result.getResponse().getContentAsString();
+
+    }
+
+    private String postInboundOrder(InboundOrderDTO inboundOrderDTO, ResultMatcher resultMatcher, String jwt) throws Exception {
 
         MvcResult response = mockmvc.perform(post("/api/v1/fresh-products/inboundorder")
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwt)
                 .content(objectMapper.writeValueAsString(inboundOrderDTO)))
                 .andExpect(resultMatcher)
                 .andReturn();
@@ -93,10 +129,11 @@ public class InboundOrderIntegrationTests {
         return response.getResponse().getContentAsString();
     }
 
-    private String putInboundOrder(InboundOrderPutDTO inboundOrderPutDTO, ResultMatcher resultMatcher) throws Exception {
+    private String putInboundOrder(InboundOrderPutDTO inboundOrderPutDTO, ResultMatcher resultMatcher, String jwt) throws Exception {
 
         MvcResult response = mockmvc.perform(put("/api/v1/fresh-products/inboundorder")
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwt)
                 .content(objectMapper.writeValueAsString(inboundOrderPutDTO)))
                 .andExpect(resultMatcher)
                 .andReturn();
@@ -108,10 +145,18 @@ public class InboundOrderIntegrationTests {
     void initialSetup() throws Exception {
 
         if (!init) {
+            String signUpDTOStockManager = signUpStockManagerBody();
+            signUpPost(status().isOk(), signUpDTOStockManager);
+
+            LoginRequest loginBody = new LoginRequest("stockmanagertest", "abcd1234");
+            String signInResponse = signInPost(loginBody, status().isOk());
+            JwtResponse jwtResponse = objectMapper.readValue(signInResponse, new TypeReference<>() {});
+            STOCK_MANAGER_JWT = jwtResponse.getToken();
+
             String inboundOrderString = getStandardInboundOrder();
             InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
 
-            postInboundOrder(inboundOrderDTO, status().isCreated());
+            postInboundOrder(inboundOrderDTO, status().isCreated(), STOCK_MANAGER_JWT);
             init = true;
         }
 
@@ -135,7 +180,7 @@ public class InboundOrderIntegrationTests {
         String inboundOrderUpdateString = getStandardUpdateInboundOrder();
         InboundOrderPutDTO inboundOrderPutDTO = objectMapper.readValue(inboundOrderUpdateString, new TypeReference<>() {});
 
-        putInboundOrder(inboundOrderPutDTO, status().isCreated());
+        putInboundOrder(inboundOrderPutDTO, status().isCreated(), STOCK_MANAGER_JWT);
         Batch batch = batchRepository.findById(inboundOrderPutDTO.getBatchStock().get(0).getId()).orElse(new Batch());
 
         assertEquals(LocalDate.of(2022, 11, 9), batch.getManufacturingDate());
@@ -152,7 +197,7 @@ public class InboundOrderIntegrationTests {
         inboundSectionDto.setSectionCode(666L);
         inboundOrderDTO.setSection(inboundSectionDto);
 
-        String responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest());
+        String responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest(), STOCK_MANAGER_JWT);
         ErrorDTO errorDtoSection = objectMapper.readValue(responseStr, new TypeReference<>() {});
 
         assertEquals("Section 666 does not exists!", errorDtoSection.getDescription());
@@ -162,7 +207,7 @@ public class InboundOrderIntegrationTests {
         inboundSectionDto.setWarehouseCode(777L);
         inboundOrderDTO.setSection(inboundSectionDto);
 
-        responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest());
+        responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest(), STOCK_MANAGER_JWT);
         ErrorDTO errorDtoWarehouse = objectMapper.readValue(responseStr, new TypeReference<>() {});
 
         assertEquals("Warehouse 777 does not exists!", errorDtoWarehouse.getDescription());
@@ -184,7 +229,7 @@ public class InboundOrderIntegrationTests {
 
         inboundOrderDTO.setBatchStock(batchStockDTOList);
 
-        String responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest());
+        String responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest(), STOCK_MANAGER_JWT);
         ErrorDTO errorDtoSection = objectMapper.readValue(responseStr, new TypeReference<>() {});
 
         assertEquals("Product 111 does not exists!", errorDtoSection.getDescription());
@@ -205,7 +250,7 @@ public class InboundOrderIntegrationTests {
 
         inboundOrderDTO.setBatchStock(batchStockDTOList);
 
-        String responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest());
+        String responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest(), STOCK_MANAGER_JWT);
         ErrorDTO errorDtoSection = objectMapper.readValue(responseStr, new TypeReference<>() {});
 
         assertEquals("Batch does not match this section!", errorDtoSection.getDescription());
@@ -221,7 +266,7 @@ public class InboundOrderIntegrationTests {
         inboundSectionDto.setWarehouseCode(2L);
         inboundOrderDTO.setSection(inboundSectionDto);
 
-        String responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest());
+        String responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest(), STOCK_MANAGER_JWT);
         ErrorDTO errorDtoSection = objectMapper.readValue(responseStr, new TypeReference<>() {});
 
         assertEquals("The informed Section does not match with informed Warehouse!", errorDtoSection.getDescription());
@@ -248,7 +293,7 @@ public class InboundOrderIntegrationTests {
 
         inboundOrderDTO.setBatchStock(batchStockDTOList);
 
-        String responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest());
+        String responseStr = postInboundOrder(inboundOrderDTO, status().isBadRequest(), STOCK_MANAGER_JWT);
         ErrorDTO errorDtoSection = objectMapper.readValue(responseStr, new TypeReference<>() {});
 
         assertEquals("Section has no available space.", errorDtoSection.getDescription());

@@ -5,6 +5,7 @@ import br.com.meli.projetointegrador.service.SectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,11 +21,13 @@ public class DueDateController {
     private SectionService sectionService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_STOCK_MANAGER')")
     public ResponseEntity<List<BatchStockDueDateDTO>> getBatchByDueDate(@RequestParam Integer days, Long id) {
         return new ResponseEntity<>(BatchStockDueDateDTO.map(sectionService.checkBatchStockDueDate(id, days)), HttpStatus.OK);
     }
 
     @GetMapping("/list")
+    @PreAuthorize("hasRole('ROLE_STOCK_MANAGER')")
     public ResponseEntity<List<BatchStockDueDateDTO>> getBatchByDueDateWithCategory(@RequestParam Integer days, String category, String order) {
         return new ResponseEntity<>(BatchStockDueDateDTO.map(sectionService.checkBatchStockDueDateByCategory(days, category, order)), HttpStatus.OK);
     }

@@ -7,6 +7,7 @@ import br.com.meli.projetointegrador.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,16 +26,19 @@ public class CartController {
     private AdvertisementService advertisementService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public ResponseEntity<TotalCartPriceDTO> postPurchaseOrder(@RequestBody CartDTO cartDTO) {
         return new ResponseEntity<>(TotalCartPriceDTO.map(cartService.save(CartDTO.map(cartDTO, customerService, advertisementService))), HttpStatus.CREATED);
     }
 
     @GetMapping("/{orderId}")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public ResponseEntity<CartWithStatusDTO> getOrderProducts(@PathVariable Long orderId) {
         return new ResponseEntity<>(CartWithStatusDTO.map(cartService.findById(orderId)), HttpStatus.OK);
     }
 
     @PutMapping("/{orderId}")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public ResponseEntity<PurchaseCartDTO> putPurchaseOrder(@PathVariable Long orderId){
         return new ResponseEntity<>(PurchaseCartDTO.map(cartService.updateCartToPurchase(orderId)), HttpStatus.OK);
     }

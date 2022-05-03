@@ -2,6 +2,8 @@ package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.dto.BatchStockDueDateDTO;
 import br.com.meli.projetointegrador.dto.InboundOrderDTO;
+import br.com.meli.projetointegrador.model.request.LoginRequest;
+import br.com.meli.projetointegrador.model.response.JwtResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +35,7 @@ public class DueDateIntegrationTests {
     private ObjectMapper objectMapper;
 
     private static boolean init = false;
+    private static String STOCK_MANAGER_JWT = "";
 
     private String getStandardInboundOrder() {
         return "{\n" +
@@ -87,10 +90,43 @@ public class DueDateIntegrationTests {
                 "}";
     }
 
-    private String postInboundOrder(InboundOrderDTO inboundOrderDTO, ResultMatcher resultMatcher) throws Exception {
+    public String signUpStockManagerBody() {
+        return "{\n" +
+                "    \"name\" : \"stockmanagertest\",\n" +
+                "    \"username\" : \"stockmanagertest\",\n" +
+                "    \"email\" : \"stockmanagertest@teste.com.br\",\n" +
+                "    \"cpf\" : \"000-000-000-01\",\n" +
+                "    \"password\" : \"abcd1234\",\n" +
+                "    \"warehouse_id\": 1,\n" +
+                "    \"role\" : [\"manager\"]\n" +
+                "}";
+    }
+
+    public void signUpPost(ResultMatcher resultMatcher, String signUpDTO) throws Exception {
+
+        mockmvc.perform(post("/api/auth/signup")
+                .contentType("application/json")
+                .content(signUpDTO))
+                .andExpect(resultMatcher);
+
+    }
+
+    public String signInPost(LoginRequest loginRequest, ResultMatcher resultMatcher) throws Exception {
+
+        MvcResult result = mockmvc.perform(post("/api/auth/signin")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(resultMatcher).andReturn();
+
+        return result.getResponse().getContentAsString();
+
+    }
+
+    private String postInboundOrder(InboundOrderDTO inboundOrderDTO, ResultMatcher resultMatcher, String jwt) throws Exception {
 
         MvcResult response = mockmvc.perform(post("/api/v1/fresh-products/inboundorder")
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwt)
                 .content(objectMapper.writeValueAsString(inboundOrderDTO)))
                 .andExpect(resultMatcher)
                 .andReturn();
@@ -98,11 +134,27 @@ public class DueDateIntegrationTests {
         return response.getResponse().getContentAsString();
     }
 
-    private String getCheckBatchStockDueDate(String days, String sectionId,ResultMatcher resultMatcher) throws Exception {
+    private String getCheckBatchStockDueDate(String days, String sectionId,ResultMatcher resultMatcher, String jwt) throws Exception {
 
         MvcResult response = mockmvc.perform(get("/api/v1/fresh-products/due-date")
+                .header("Authorization", "Bearer " + jwt)
                 .param("days", days)
                 .param("id", sectionId))
+                .andExpect(resultMatcher)
+                .andReturn();
+
+
+        return response.getResponse().getContentAsString();
+    }
+
+    private String getCheckBatchStockDueDateWithCategory(String days, String category, String order, ResultMatcher resultMatcher, String jwt) throws Exception {
+
+        MvcResult response = mockmvc.perform(get("/api/v1/fresh-products/due-date/list")
+                .header("Authorization", "Bearer " + jwt)
+                .param("days", days)
+                .param("category", category)
+                .param("order", order)
+        )
                 .andExpect(resultMatcher)
                 .andReturn();
 
@@ -114,10 +166,18 @@ public class DueDateIntegrationTests {
     void initialSetup() throws Exception {
 
         if (!init) {
+            String signUpDTOStockManager = signUpStockManagerBody();
+            signUpPost(status().isOk(), signUpDTOStockManager);
+
+            LoginRequest loginBody = new LoginRequest("stockmanagertest", "abcd1234");
+            String signInResponse = signInPost(loginBody, status().isOk());
+            JwtResponse jwtResponse = objectMapper.readValue(signInResponse, new TypeReference<>() {});
+            STOCK_MANAGER_JWT = jwtResponse.getToken();
+
             String inboundOrderString = getStandardInboundOrder();
             InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
 
-            postInboundOrder(inboundOrderDTO, status().isCreated());
+            postInboundOrder(inboundOrderDTO, status().isCreated(), STOCK_MANAGER_JWT);
             init = true;
         }
     }
@@ -125,32 +185,20 @@ public class DueDateIntegrationTests {
     @Test
     void getBatchStockByDueDate() throws Exception {
 
-        String checkBatchStockDueDate = getCheckBatchStockDueDate("64", "1",status().isOk());
+        String checkBatchStockDueDate = getCheckBatchStockDueDate("64", "1",status().isOk(), STOCK_MANAGER_JWT);
 
         List<BatchStockDueDateDTO> batchStockDueDateDTOList = objectMapper.readValue(checkBatchStockDueDate, new TypeReference<>() {});
 
         assertEquals(2, batchStockDueDateDTOList.size());
     }
 
-    private String getCheckBatchStockDueDateWithCategory(String days, String category, String order, ResultMatcher resultMatcher) throws Exception {
-
-        MvcResult response = mockmvc.perform(get("/api/v1/fresh-products/due-date/list")
-                .param("days", days)
-                .param("category", category)
-                .param("order", order)
-                )
-                .andExpect(resultMatcher)
-                .andReturn();
-
-
-        return response.getResponse().getContentAsString();
-    }
-
     @Test
     void getBatchStockByDueDateWithCategory() throws Exception {
 
-        String checkBatchStockDueDateWithCategory1 = getCheckBatchStockDueDateWithCategory("95", "FROZEN", "asc", status().isOk());
-        String checkBatchStockDueDateWithCategory2 = getCheckBatchStockDueDateWithCategory("95", "FROZEN", "desc", status().isOk());
+        String checkBatchStockDueDateWithCategory1 = getCheckBatchStockDueDateWithCategory("95", "FROZEN", "asc",
+                status().isOk(), STOCK_MANAGER_JWT);
+        String checkBatchStockDueDateWithCategory2 = getCheckBatchStockDueDateWithCategory("95", "FROZEN", "desc",
+                status().isOk(), STOCK_MANAGER_JWT);
 
         List<BatchStockDueDateDTO> batchStockDueDateDTOList1 = objectMapper.readValue(checkBatchStockDueDateWithCategory1, new TypeReference<>() {});
         List<BatchStockDueDateDTO> batchStockDueDateDTOList2 = objectMapper.readValue(checkBatchStockDueDateWithCategory2, new TypeReference<>() {});

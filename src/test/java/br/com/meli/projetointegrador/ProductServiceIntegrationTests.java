@@ -2,9 +2,12 @@ package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.dto.InboundOrderDTO;
 import br.com.meli.projetointegrador.dto.ProductByBatchResponseImpl;
+import br.com.meli.projetointegrador.model.request.LoginRequest;
+import br.com.meli.projetointegrador.model.response.JwtResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -35,6 +38,9 @@ public class ProductServiceIntegrationTests {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    private static boolean init = false;
+    private static String STOCK_MANAGER_JWT = "";
 
     private String getStandardInboundOrder_1() {
         return "{\n" +
@@ -103,11 +109,43 @@ public class ProductServiceIntegrationTests {
     }
 
 
+    public String signUpStockManagerBody() {
+        return "{\n" +
+                "    \"name\" : \"stockmanagertest\",\n" +
+                "    \"username\" : \"stockmanagertest\",\n" +
+                "    \"email\" : \"stockmanagertest@teste.com.br\",\n" +
+                "    \"cpf\" : \"000-000-000-01\",\n" +
+                "    \"password\" : \"abcd1234\",\n" +
+                "    \"warehouse_id\": 1,\n" +
+                "    \"role\" : [\"manager\"]\n" +
+                "}";
+    }
 
-    private String postInboundOrder(InboundOrderDTO inboundOrderDTO, ResultMatcher resultMatcher) throws Exception {
+    public void signUpPost(ResultMatcher resultMatcher, String signUpDTO) throws Exception {
+
+        mockmvc.perform(post("/api/auth/signup")
+                .contentType("application/json")
+                .content(signUpDTO))
+                .andExpect(resultMatcher);
+
+    }
+
+    public String signInPost(LoginRequest loginRequest, ResultMatcher resultMatcher) throws Exception {
+
+        MvcResult result = mockmvc.perform(post("/api/auth/signin")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(resultMatcher).andReturn();
+
+        return result.getResponse().getContentAsString();
+
+    }
+
+    private String postInboundOrder(InboundOrderDTO inboundOrderDTO, ResultMatcher resultMatcher, String jwt) throws Exception {
 
         MvcResult response = mockmvc.perform(post("/api/v1/fresh-products/inboundorder")
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwt)
                 .content(objectMapper.writeValueAsString(inboundOrderDTO)))
                 .andExpect(resultMatcher)
                 .andReturn();
@@ -115,10 +153,11 @@ public class ProductServiceIntegrationTests {
         return response.getResponse().getContentAsString();
     }
 
-    private String getProductById(Long productId, String orderBy, ResultMatcher resultMatcher) throws Exception {
+    private String getProductById(Long productId, String orderBy, ResultMatcher resultMatcher, String jwt) throws Exception {
 
         MvcResult response = mockmvc.perform(get("/api/v1/fresh-products/product")
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + jwt)
                 .param("productId", String.valueOf(productId))
                 .param("orderBy", orderBy))
                 .andExpect(resultMatcher)
@@ -128,18 +167,34 @@ public class ProductServiceIntegrationTests {
     }
 
 
+    @BeforeEach
+    void initialSetup() throws Exception {
+
+        if (!init) {
+            String signUpDTOStockManager = signUpStockManagerBody();
+            signUpPost(status().isOk(), signUpDTOStockManager);
+
+            LoginRequest loginBody = new LoginRequest("stockmanagertest", "abcd1234");
+            String signInResponse = signInPost(loginBody, status().isOk());
+            JwtResponse jwtResponse = objectMapper.readValue(signInResponse, new TypeReference<>() {});
+            STOCK_MANAGER_JWT = jwtResponse.getToken();
+
+            String inboundOrderString_1 = getStandardInboundOrder_1();
+            InboundOrderDTO inboundOrderDTO_1 = objectMapper.readValue(inboundOrderString_1, new TypeReference<>() {});
+            postInboundOrder(inboundOrderDTO_1, status().isCreated(), STOCK_MANAGER_JWT);
+
+            String inboundOrderString_2 = getStandardInboundOrder_2();
+            InboundOrderDTO inboundOrderDTO_2 = objectMapper.readValue(inboundOrderString_2, new TypeReference<>() {});
+            postInboundOrder(inboundOrderDTO_2, status().isCreated(), STOCK_MANAGER_JWT);
+
+            init = true;
+        }
+    }
+
     @Test
     void getProductsThatHaveBatchTestOrder() throws Exception {
-        String inboundOrderString_1 = getStandardInboundOrder_1();
-        InboundOrderDTO inboundOrderDTO_1 = objectMapper.readValue(inboundOrderString_1, new TypeReference<>() {});
-        postInboundOrder(inboundOrderDTO_1, status().isCreated());
-
-        String inboundOrderString_2 = getStandardInboundOrder_2();
-        InboundOrderDTO inboundOrderDTO_2 = objectMapper.readValue(inboundOrderString_2, new TypeReference<>() {});
-        postInboundOrder(inboundOrderDTO_2, status().isCreated());
-
-
-        String responseProducts = getProductById(1L, "F", status().isOk());
+        getProductById(1L, "F", status().isUnauthorized(), "");
+        String responseProducts = getProductById(1L, "F", status().isOk(), STOCK_MANAGER_JWT);
         List<ProductByBatchResponseImpl> productByBatchResponseDate = objectMapper.readValue(responseProducts,
                 new TypeReference<>() {});
 
@@ -147,7 +202,7 @@ public class ProductServiceIntegrationTests {
         assertEquals("2022-02-02", productByBatchResponseDate.get(1).getExpirationDate());
 
 
-        responseProducts = getProductById(1L, "C", status().isOk());
+        responseProducts = getProductById(1L, "C", status().isOk(), STOCK_MANAGER_JWT);
         List<ProductByBatchResponseImpl> productByBatchResponseQuant = objectMapper.readValue(responseProducts,
                 new TypeReference<>() {});
 
@@ -157,7 +212,7 @@ public class ProductServiceIntegrationTests {
                 () -> assertEquals("2022-02-02", productByBatchResponseQuant.get(0).getExpirationDate())
         );
 
-        responseProducts = getProductById(1L, "L", status().isOk());
+        responseProducts = getProductById(1L, "L", status().isOk(), STOCK_MANAGER_JWT);
         List<ProductByBatchResponseImpl> productByBatchResponseBatch = objectMapper.readValue(responseProducts,
                 new TypeReference<>() {});
 
