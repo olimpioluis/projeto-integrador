@@ -1,7 +1,5 @@
 package br.com.meli.projetointegrador.service;
 
-import br.com.meli.projetointegrador.exception.InexistentCartException;
-import br.com.meli.projetointegrador.exception.InexistentSectionException;
 import br.com.meli.projetointegrador.model.*;
 import br.com.meli.projetointegrador.repository.CartRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CartServiceTest {
 
