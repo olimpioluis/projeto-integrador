@@ -32,7 +32,8 @@ public class InboundOrderServiceImpl implements InboundOrderService {
     @Override
     public List<Batch> save(InboundOrder inboundOrder) {
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         StockManager stockManager = stockManagerService.findByUserUsername(userDetails.getUsername());
         inboundOrder.setStockManager(stockManager);
 
