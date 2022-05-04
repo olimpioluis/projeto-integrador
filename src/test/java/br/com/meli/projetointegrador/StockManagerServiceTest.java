@@ -1,10 +1,12 @@
-package br.com.meli.projetointegrador.service;
+package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.exception.InexistentStockManagerException;
 import br.com.meli.projetointegrador.model.StockManager;
 import br.com.meli.projetointegrador.model.User;
 import br.com.meli.projetointegrador.model.Warehouse;
 import br.com.meli.projetointegrador.repository.StockManagerRepository;
+import br.com.meli.projetointegrador.service.StockManagerService;
+import br.com.meli.projetointegrador.service.StockManagerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

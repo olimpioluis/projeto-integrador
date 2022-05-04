@@ -2,8 +2,10 @@ package br.com.meli.projetointegrador.service;
 
 import br.com.meli.projetointegrador.dto.ProductByBatchResponse;
 import br.com.meli.projetointegrador.dto.ProductDTOi;
+import br.com.meli.projetointegrador.exception.EmptyProductListException;
 import br.com.meli.projetointegrador.exception.InexistentProductException;
 import br.com.meli.projetointegrador.model.Batch;
+import br.com.meli.projetointegrador.model.Category;
 import br.com.meli.projetointegrador.model.Product;
 import br.com.meli.projetointegrador.repository.BatchRepository;
 import br.com.meli.projetointegrador.repository.ProductRepository;
@@ -52,17 +54,38 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> findAll(){
+        if(productRepository.findAll().size() == 0){
+            throw new EmptyProductListException("No products were found for this search.");
+        }
         return productRepository.findAll();
     }
 
     @Override
     public List<ProductDTOi> findAllByBatchListExists() {
+        if(productRepository.findAllByBatchListExists().size() == 0){
+            throw new EmptyProductListException("No products were found for this search.");
+        }
+
         return productRepository.findAllByBatchListExists();
     }
 
     @Override
     public List<ProductDTOi> findAllByBatchListExistsBySection(String category) {
-        return productRepository.findAllByBatchListExistsBySection(category);
+        Category categoryMap;
+
+        switch (category){
+            case "FS": categoryMap = Category.FRESH;
+                break;
+            case "RF": categoryMap = Category.REFRIGERATED;
+                break;
+            default: categoryMap = Category.FROZEN;
+                break;
+        }
+
+        if(productRepository.findAllByBatchListExistsBySection(categoryMap.name()).size() == 0 ){
+            throw new EmptyProductListException("No products were found for this search.");
+        }
+        return productRepository.findAllByBatchListExistsBySection(categoryMap.name());
     }
 
     @Override
