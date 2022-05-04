@@ -17,6 +17,11 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe controladora responsável por lidar com as rotas referentes a classe Warehouse.
+ * Possui rotas para listagem de produtos que estão em um armazem especifico.
+ * @author Jeferson Barbosa Souza
+ */
 @RestController
 @RequestMapping("/api/v1/fresh-products/warehouse")
 public class WarehouseController {
@@ -30,9 +35,10 @@ public class WarehouseController {
 
         List<Object[]> groupAllByWarehouseResult = batchService.getBatchStockByWarehouse(productId);
         List<QuantityByWarehouseDTO> quantityByWarehouseDTOList = new ArrayList<>();
-
+/**
+ * @see Casting only works for MySQL, for H2 tests, we have to use the constructor
+ */
         for (Object[] item: groupAllByWarehouseResult) {
-            // Casting only works for MySQL, for H2 tests, we have to use the constructor
             String quantityString = item[0].toString();
             BigDecimal totalQuantity = new BigDecimal(quantityString);
             quantityByWarehouseDTOList.add(new QuantityByWarehouseDTO(totalQuantity, (BigInteger) item[1]));

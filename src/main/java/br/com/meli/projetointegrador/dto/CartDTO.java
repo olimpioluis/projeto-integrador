@@ -13,6 +13,9 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Getter;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,13 +23,18 @@ import java.util.stream.Collectors;
 @Getter
 public class CartDTO {
 
+    @NotNull(message = "OrderDate missing.")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate orderDate;
 
+    @NotNull(message = "CustomerId missing.")
     private Long customerId;
-    private OrderStatus orderStatus;
-    private List<ItemDTO> items;
+
+    @NotNull(message = "OrderStatus missing.")
+    private @Valid OrderStatus orderStatus;
+    @NotNull(message = "Items missing.")
+    private List<@Valid ItemDTO> items;
 
     public static Cart map(CartDTO cartDTO, CustomerService customerService, AdvertisementService advertisementService) {
         Customer customer = customerService.findById(cartDTO.getCustomerId());

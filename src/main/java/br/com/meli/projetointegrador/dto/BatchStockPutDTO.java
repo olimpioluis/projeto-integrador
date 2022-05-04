@@ -7,6 +7,7 @@ import br.com.meli.projetointegrador.service.BatchService;
 import br.com.meli.projetointegrador.service.ProductService;
 import lombok.Getter;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;

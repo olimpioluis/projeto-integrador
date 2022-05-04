@@ -1,7 +1,8 @@
-package br.com.meli.projetointegrador.service;
+package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.model.*;
 import br.com.meli.projetointegrador.repository.CartRepository;
+import br.com.meli.projetointegrador.service.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -61,7 +62,7 @@ public class CartServiceTest {
         Advertisement advertisement = new Advertisement(1L, "Advertisement 1", BigDecimal.valueOf(100), product, new Seller());
         Item item = new Item(1L, advertisement, new Cart(), 100);
 
-        Cart cart = new Cart(1L, LocalDate.of(2022, 1, 1), new Customer(), BigDecimal.valueOf(0), new OrderStatus(), Arrays.asList(item));
+        Cart cart = new Cart(1L, LocalDate.of(2022, 1, 1), new Customer(), BigDecimal.valueOf(0), new OrderStatus(1L, StatusCode.CART), Arrays.asList(item));
 
         item.setCart(cart);
 
@@ -82,7 +83,7 @@ public class CartServiceTest {
         Advertisement advertisement = new Advertisement(1L, "Advertisement 1", BigDecimal.valueOf(100), product, new Seller());
         Item item = new Item(1L, advertisement, new Cart(), 100);
 
-        Cart cart = new Cart(1L, LocalDate.of(2022, 1, 1), new Customer(), BigDecimal.valueOf(0), new OrderStatus(), Arrays.asList(item));
+        Cart cart = new Cart(1L, LocalDate.of(2022, 1, 1), new Customer(), BigDecimal.valueOf(0), new OrderStatus(1L, StatusCode.PURCHASE), Arrays.asList(item));
 
         item.setCart(cart);
 
@@ -94,7 +95,6 @@ public class CartServiceTest {
         Mockito.when(cartRepository.findById(Mockito.any())).thenReturn(java.util.Optional.of(cart));
         Mockito.when(itemService.save(Mockito.any())).thenReturn(new ArrayList<>());
 
-        cartService.save(cart);
-        assertEquals(cart, cartService.updateCartToPurchase(1L));
+        assertEquals(cart.getOrderStatus().getStatusCode().name(), cartService.updateCartToPurchase(1L).getOrderStatus().getStatusCode().name());
     }
 }

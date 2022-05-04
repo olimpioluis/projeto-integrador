@@ -14,7 +14,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-
+/**
+ * Classe de serviço responsável por processar  os lotes.
+ * @author Igor de Souza Nogueira
+ * @author Luis Felipe Floriano Olimpio
+ */
 @Service
 @AllArgsConstructor
 public class BatchServiceImpl implements BatchService {

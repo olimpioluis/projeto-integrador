@@ -14,7 +14,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
+/**
+ * Classe de implementação de SectionService responsável por processar dados de Section.
+ * @author Jederson Carvalho Macedo
+ * */
 @Service
 @AllArgsConstructor
 public class SectionServiceImpl implements SectionService {

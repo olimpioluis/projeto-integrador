@@ -1,9 +1,10 @@
-package br.com.meli.projetointegrador.service;
+package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.model.Advertisement;
 import br.com.meli.projetointegrador.model.Product;
 import br.com.meli.projetointegrador.model.Seller;
 import br.com.meli.projetointegrador.repository.AdvertisementRepository;
+import br.com.meli.projetointegrador.service.AdvertisementServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

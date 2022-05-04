@@ -1,4 +1,4 @@
-package br.com.meli.projetointegrador.service;
+package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.dto.QuantityByWarehouseDTO;
 import br.com.meli.projetointegrador.exception.InexistentBatchException;
@@ -6,6 +6,8 @@ import br.com.meli.projetointegrador.exception.InexistentInboundOrderException;
 import br.com.meli.projetointegrador.exception.NotFoundProductException;
 import br.com.meli.projetointegrador.model.*;
 import br.com.meli.projetointegrador.repository.BatchRepository;
+import br.com.meli.projetointegrador.service.BatchServiceImpl;
+import br.com.meli.projetointegrador.service.SectionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -26,7 +28,7 @@ public class BatchServiceTest {
     @Mock
     private BatchRepository batchRepository;
     @Mock
-    private  SectionService sectionService;
+    private SectionService sectionService;
 
     @BeforeEach
     private void initializeBatchService() {

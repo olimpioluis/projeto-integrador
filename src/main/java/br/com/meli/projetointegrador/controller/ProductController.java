@@ -53,16 +53,7 @@ public class ProductController {
     @GetMapping("/list")
     @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public List<ProductDTOi> productListAllByCategory(@RequestParam String category) {
-        Category category1;
-        switch (category){
-            case "FS": category1 = Category.FRESH;
-                break;
-            case "RF": category1 = Category.REFRIGERATED;
-                break;
-            default: category1 = Category.FROZEN;
-                break;
-        }
-        return productService.findAllByBatchListExistsBySection(category1.toString());
+        return productService.findAllByBatchListExistsBySection(category);
     }
 
 }

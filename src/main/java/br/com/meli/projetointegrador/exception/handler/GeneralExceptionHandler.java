@@ -4,6 +4,8 @@ import br.com.meli.projetointegrador.dto.ErrorDTO;
 import br.com.meli.projetointegrador.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -97,6 +99,36 @@ public class GeneralExceptionHandler {
     @ExceptionHandler(ProductHasNotEnoughStockException.class)
     protected ResponseEntity<ErrorDTO> handleProductHasNotEnoughStockException(ProductHasNotEnoughStockException ex){
         ErrorDTO error = new ErrorDTO("ProductHasNotEnoughStockException", "The following items has not enough stock to purchase: " + ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    protected ResponseEntity<ErrorDTO> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex){
+        ErrorDTO error = new ErrorDTO("MethodArgumentNotValidException",  ex.getBindingResult().getFieldError().getDefaultMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    protected ResponseEntity<ErrorDTO> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex){
+        ErrorDTO error = new ErrorDTO("HttpMessageNotReadableException",  ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EmptyProductListException.class)
+    protected ResponseEntity<ErrorDTO> handleEmptyProductListException(EmptyProductListException ex){
+        ErrorDTO error = new ErrorDTO("EmptyProductListException",  ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InexistentCartException.class)
+    protected ResponseEntity<ErrorDTO> handleInexistentCartException(InexistentCartException ex){
+        ErrorDTO error = new ErrorDTO("InexistentCartException",  ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(StatusCodeIncorrectException.class)
+    protected ResponseEntity<ErrorDTO> handleStatusCodeIncorrectException(StatusCodeIncorrectException ex){
+        ErrorDTO error = new ErrorDTO("StatusCodeIncorrectException",  ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 

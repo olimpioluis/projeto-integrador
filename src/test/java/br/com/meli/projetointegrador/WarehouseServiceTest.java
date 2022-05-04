@@ -1,4 +1,4 @@
-package br.com.meli.projetointegrador.service;
+package br.com.meli.projetointegrador;
 
 
 import br.com.meli.projetointegrador.exception.InexistentWarehouseException;
@@ -6,6 +6,8 @@ import br.com.meli.projetointegrador.model.Section;
 import br.com.meli.projetointegrador.model.StockManager;
 import br.com.meli.projetointegrador.model.Warehouse;
 import br.com.meli.projetointegrador.repository.WarehouseRepository;
+import br.com.meli.projetointegrador.service.WarehouseService;
+import br.com.meli.projetointegrador.service.WarehouseServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
