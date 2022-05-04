@@ -12,7 +12,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Classe de implementação de ProductService responsável por processar dados de Product.
+ * Possui serviços para bucar produtos, com especificidades diversas.
+ * @author Jeferson Barbosa Souza
+ * @author Lucas Troleiz Lopes
+ */
 @Service
 @AllArgsConstructor
 public class ProductServiceImpl implements ProductService {

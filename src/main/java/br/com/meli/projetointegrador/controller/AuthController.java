@@ -15,7 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-
+/**
+ * Classe controladora responsável por lidar com as rotas referentes a autenticação.
+ * Possui rotas para autenticacao.
+ * @author Arthur Guedes de Souza
+ */
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")

@@ -3,7 +3,6 @@ package br.com.meli.projetointegrador.controller;
 import br.com.meli.projetointegrador.dto.BatchStockDTO;
 import br.com.meli.projetointegrador.dto.InboundOrderDTO;
 import br.com.meli.projetointegrador.dto.InboundOrderPutDTO;
-import br.com.meli.projetointegrador.model.Batch;
 import br.com.meli.projetointegrador.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Classe controladora responsável por lidar com as rotas referentes a classe InboundOrder.
+ * Possui rotas para criar ordens de entrada e edita-las.
+ * @author Luis Felipe Floriano Olimpio
+ * */
 @RestController
 @RequestMapping("/api/v1/fresh-products/inboundorder")
 public class InboundOrderController {

@@ -13,6 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * Classe controladora responsável por lidar com as rotas referentes a classe DueDate.
+ * Possui rotas para listar produtos que estão dentro da data de validade
+ * @author Igor de Souza Nogueira
+ * @author Luis Felipe Floriano Olimpio
+ * */
 @RestController
 @RequestMapping("/api/v1/fresh-products/due-date")
 public class DueDateController {

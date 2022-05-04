@@ -12,7 +12,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
+/**
+ * Classe de implementação de InboundOrderService responsável por processar dados de InboundOrder.
+ * Possui serviços para criar ordens de entrada, edita-las e busca-las.
+ * @author Jeferson Barbosa Souza
+ * */
 @Service
 @AllArgsConstructor
 public class InboundOrderServiceImpl implements InboundOrderService {

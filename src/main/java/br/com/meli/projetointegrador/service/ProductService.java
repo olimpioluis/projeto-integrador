@@ -5,7 +5,11 @@ import br.com.meli.projetointegrador.dto.ProductDTOi;
 import br.com.meli.projetointegrador.model.Product;
 
 import java.util.List;
-
+/**
+ * Interface de serviço responsável por processar dados de Product.
+ * @author Jeferson Barbosa Souza
+ * @author Lucas Troleiz Lopes
+ */
 public interface ProductService {
     Product findById(Long id);
 

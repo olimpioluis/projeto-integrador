@@ -23,7 +23,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
-
+/**
+ * Classe de serviço responsável por processar  as autenticações.
+ * @author Arthur Guedes de Souza
+ */
 @Service
 public class AuthService {
     @Autowired
