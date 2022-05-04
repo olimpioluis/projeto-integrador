@@ -5,7 +5,10 @@ import br.com.meli.projetointegrador.model.Advertisement;
 import br.com.meli.projetointegrador.repository.AdvertisementRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
+/**
+ * Classe de serviço responsável por processar  os anuncios.
+ * @author Arthur Guedes de Souza
+ */
 @Service
 @AllArgsConstructor
 public class AdvertisementServiceImpl implements AdvertisementService {

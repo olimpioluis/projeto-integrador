@@ -10,8 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+
 import javax.validation.Valid;
 
+
+/**
+ * Classe controladora responsável por lidar com as rotas referentes a classe Cart.
+ * Possui rotas para criar ordens de compra, edita-las e efetiva-las.
+ * @author Igor de Souza Nogueira
+ * @author Luis Felipe Floriano Olimpio
+ * */
 @RestController
 @RequestMapping("/api/v1/fresh-products/orders")
 public class CartController {

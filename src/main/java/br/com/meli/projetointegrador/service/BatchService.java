@@ -6,7 +6,11 @@ import br.com.meli.projetointegrador.model.Item;
 import java.util.List;
 
 import java.util.List;
-
+/**
+ * Interface de serviço responsável por processar  os lotes.
+ * @author Igor de Souza Nogueira
+ * @author Luis Felipe Floriano Olimpio
+ */
 public interface BatchService {
     List<Batch> save(List<Batch> batches);
     Batch findById(Long id);

@@ -15,7 +15,12 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-
+/**
+ * Classe de implementação de CartService responsável por processar dados de Cart.
+ * Possui serviços para criar ordens de compra, edita-las e efetiva-las.
+ * @author Igor de Souza Nogueira
+ * @author Luis Felipe Floriano Olimpio
+ * */
 @Service
 @AllArgsConstructor
 public class CartServiceImpl implements CartService {

@@ -15,6 +15,11 @@ import lombok.Getter;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Classe DTO para retornar status de uma Cart após atualização.
+ * @author Igor de Souza Nogueira
+ * @author Luis Felipe Floriano Olimpio
+ */
 @AllArgsConstructor
 @Getter
 public class CartWithStatusDTO {

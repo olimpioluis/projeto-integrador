@@ -4,7 +4,10 @@ import br.com.meli.projetointegrador.model.Batch;
 import br.com.meli.projetointegrador.model.Section;
 
 import java.util.List;
-
+/**
+ * Interface de serviço responsável por processar dados de Section.
+ * @author Jederson Carvalho Macedo
+ * */
 public interface SectionService {
     Section findById(Long id);
 
