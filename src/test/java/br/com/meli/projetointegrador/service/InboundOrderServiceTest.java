@@ -3,19 +3,25 @@ package br.com.meli.projetointegrador.service;
 import br.com.meli.projetointegrador.exception.*;
 import br.com.meli.projetointegrador.model.*;
 import br.com.meli.projetointegrador.repository.*;
+import br.com.meli.projetointegrador.security.services.UserDetailsImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithSecurityContext;
+import org.springframework.security.test.context.support.WithUserDetails;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 
 public class InboundOrderServiceTest {
 
@@ -38,9 +44,18 @@ public class InboundOrderServiceTest {
        this.inboundOrderService = new InboundOrderServiceImpl(inboundOrderRepository, batchService, sectionService, stockManagerService, warehouseService);
    }
 
+   private void initializeAuthentication(){
+       Authentication authentication = Mockito.mock(Authentication.class);
+       SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+
+       Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+       Mockito.when((UserDetailsImpl) authentication.getPrincipal()).thenReturn(UserDetailsImpl.build(new User(1L, "Igor", "123.456.789-10", "igor@gmail.com", "igor_sn", "abcd1234", Set.of(new Role(1, ERole.ROLE_STOCK_MANAGER)))));
+       SecurityContextHolder.setContext(securityContext);
+   }
+
     private InboundOrder generateInboundOrder(){
-        StockManager stockManagerIgor = new StockManager(1L, new User(1L, "Igor", "123.456.789-10", "igor@gmail.com"), new Warehouse());
-        StockManager stockManagerJederson = new StockManager(2L, new User(2L, "Jederson", "103.476.729-30", "jederson@gmail.com"), new Warehouse());
+        StockManager stockManagerIgor = new StockManager(1L, new User(1L, "Igor", "123.456.789-10", "igor@gmail.com", "igor_sn", "abcd1234", Set.of(new Role(1, ERole.ROLE_STOCK_MANAGER))), new Warehouse());
+        StockManager stockManagerJederson = new StockManager(2L, new User(2L, "Jederson", "103.476.729-30", "jederson@gmail.com", "jed", "abcd1234", Set.of(new Role(1, ERole.ROLE_STOCK_MANAGER))), new Warehouse());
 
         Warehouse warehouse = new Warehouse(1L,"Warehouse 1", Arrays.asList(stockManagerIgor, stockManagerJederson), Collections.singletonList(new Section()));
 
@@ -76,10 +91,14 @@ public class InboundOrderServiceTest {
     public void saveInboundOrderTest(){
         InboundOrder inboundOrder = generateInboundOrder();
 
+        initializeAuthentication();
+
         Mockito.when(inboundOrderRepository.save(Mockito.any())).thenReturn(inboundOrder);
         Mockito.when(batchService.save(Mockito.any())).thenReturn(inboundOrder.getBatchList());
         Mockito.when(sectionService.findById(Mockito.any())).thenReturn(inboundOrder.getSection());
         Mockito.when(warehouseService.findById(Mockito.any())).thenReturn(inboundOrder.getSection().getWarehouse());
+        Mockito.when(stockManagerService.findByUserUsername(Mockito.any())).thenReturn(inboundOrder.getStockManager());
+        Mockito.when(stockManagerService.findById(Mockito.any())).thenReturn(inboundOrder.getStockManager());
 
         List<Batch> response = inboundOrderService.save(inboundOrder);
 
@@ -90,10 +109,14 @@ public class InboundOrderServiceTest {
     public void updateInboundOrderTest(){
         InboundOrder inboundOrder = generateInboundOrder();
 
+        initializeAuthentication();
+
         Mockito.when(inboundOrderRepository.save(Mockito.any())).thenReturn(inboundOrder);
         Mockito.when(batchService.save(Mockito.any())).thenReturn(inboundOrder.getBatchList());
         Mockito.when(sectionService.findById(Mockito.any())).thenReturn(inboundOrder.getSection());
-
+        Mockito.when(warehouseService.findById(Mockito.any())).thenReturn(inboundOrder.getSection().getWarehouse());
+        Mockito.when(stockManagerService.findByUserUsername(Mockito.any())).thenReturn(inboundOrder.getStockManager());
+        Mockito.when(stockManagerService.findById(Mockito.any())).thenReturn(inboundOrder.getStockManager());
 
         inboundOrder.getBatchList().get(0).setExpirationDate(LocalDate.of(2022, 6, 9));
 
@@ -117,20 +140,33 @@ public class InboundOrderServiceTest {
     @Test
     public void SectionAvailableSpaceValidatorTest(){
         InboundOrder inboundOrder = generateInboundOrder();
-        inboundOrder.getSection().setCurrentSize(0);
+
+        initializeAuthentication();
 
         Mockito.when(inboundOrderRepository.save(Mockito.any())).thenReturn(inboundOrder);
+        Mockito.when(batchService.save(Mockito.any())).thenReturn(inboundOrder.getBatchList());
         Mockito.when(sectionService.findById(Mockito.any())).thenReturn(inboundOrder.getSection());
         Mockito.when(warehouseService.findById(Mockito.any())).thenReturn(inboundOrder.getSection().getWarehouse());
+        Mockito.when(stockManagerService.findByUserUsername(Mockito.any())).thenReturn(inboundOrder.getStockManager());
+        Mockito.when(stockManagerService.findById(Mockito.any())).thenReturn(inboundOrder.getStockManager());
+
+        inboundOrder.getSection().setCurrentSize(0);
 
         assertThrows(SectionUnavailableSpaceException.class, () -> inboundOrderService.save(inboundOrder));
-
     }
 
     @Test
     public void WarehouseExistsValidatorTest(){
         InboundOrder inboundOrder = generateInboundOrder();
 
+        initializeAuthentication();
+
+        Mockito.when(inboundOrderRepository.save(Mockito.any())).thenReturn(inboundOrder);
+        Mockito.when(batchService.save(Mockito.any())).thenReturn(inboundOrder.getBatchList());
+        Mockito.when(sectionService.findById(Mockito.any())).thenReturn(inboundOrder.getSection());
+        Mockito.when(warehouseService.findById(Mockito.any())).thenReturn(inboundOrder.getSection().getWarehouse());
+        Mockito.when(stockManagerService.findByUserUsername(Mockito.any())).thenReturn(inboundOrder.getStockManager());
+        Mockito.when(stockManagerService.findById(Mockito.any())).thenReturn(inboundOrder.getStockManager());
         Mockito.when(warehouseService.findById(Mockito.any())).thenThrow(InexistentWarehouseException.class);
 
         assertThrows(InexistentWarehouseException.class, () -> inboundOrderService.save(inboundOrder));
@@ -141,6 +177,14 @@ public class InboundOrderServiceTest {
     public void SectionExistsValidatorTest(){
         InboundOrder inboundOrder = generateInboundOrder();
 
+        initializeAuthentication();
+
+        Mockito.when(inboundOrderRepository.save(Mockito.any())).thenReturn(inboundOrder);
+        Mockito.when(batchService.save(Mockito.any())).thenReturn(inboundOrder.getBatchList());
+        Mockito.when(sectionService.findById(Mockito.any())).thenReturn(inboundOrder.getSection());
+        Mockito.when(warehouseService.findById(Mockito.any())).thenReturn(inboundOrder.getSection().getWarehouse());
+        Mockito.when(stockManagerService.findByUserUsername(Mockito.any())).thenReturn(inboundOrder.getStockManager());
+        Mockito.when(stockManagerService.findById(Mockito.any())).thenReturn(inboundOrder.getStockManager());
         Mockito.when(sectionService.findById(Mockito.any())).thenThrow(InexistentSectionException.class);
 
         assertThrows(InexistentSectionException.class, () -> inboundOrderService.save(inboundOrder));
@@ -150,11 +194,17 @@ public class InboundOrderServiceTest {
     public void SectionMatchWithWarehouseValidatorTest(){
         InboundOrder inboundOrder = generateInboundOrder();
 
+        initializeAuthentication();
+
         Section section3 = new Section(3L, "Section 3", Category.FRESH, 6, 6, new Warehouse(), Collections.singletonList(new Batch()));
 
+
+        Mockito.when(batchService.save(Mockito.any())).thenReturn(inboundOrder.getBatchList());
+        Mockito.when(warehouseService.findById(Mockito.any())).thenReturn(inboundOrder.getSection().getWarehouse());
+        Mockito.when(stockManagerService.findByUserUsername(Mockito.any())).thenReturn(inboundOrder.getStockManager());
+        Mockito.when(stockManagerService.findById(Mockito.any())).thenReturn(inboundOrder.getStockManager());
         Mockito.when(inboundOrderRepository.save(Mockito.any())).thenReturn(inboundOrder);
         Mockito.when(sectionService.findById(Mockito.any())).thenReturn(section3);
-        Mockito.when(warehouseService.findById(Mockito.any())).thenReturn(inboundOrder.getSection().getWarehouse());
 
         assertThrows(SectionNotMatchWithWarehouseException.class, () -> inboundOrderService.save(inboundOrder));
     }
@@ -163,11 +213,16 @@ public class InboundOrderServiceTest {
     public void SectionMatchWithBatchCategoryValidatorTest(){
         InboundOrder inboundOrder = generateInboundOrder();
 
+        initializeAuthentication();
+
         inboundOrder.getSection().setCategory(Category.REFRIGERATED);
 
         Mockito.when(inboundOrderRepository.save(Mockito.any())).thenReturn(inboundOrder);
+        Mockito.when(batchService.save(Mockito.any())).thenReturn(inboundOrder.getBatchList());
         Mockito.when(sectionService.findById(Mockito.any())).thenReturn(inboundOrder.getSection());
         Mockito.when(warehouseService.findById(Mockito.any())).thenReturn(inboundOrder.getSection().getWarehouse());
+        Mockito.when(stockManagerService.findByUserUsername(Mockito.any())).thenReturn(inboundOrder.getStockManager());
+        Mockito.when(stockManagerService.findById(Mockito.any())).thenReturn(inboundOrder.getStockManager());
 
         assertThrows(SectionNotMatchWithBatchCategoryException.class, () -> inboundOrderService.save(inboundOrder));
     }

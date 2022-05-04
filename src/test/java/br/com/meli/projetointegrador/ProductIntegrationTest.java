@@ -95,7 +95,7 @@ public class ProductIntegrationTest {
 
         MvcResult response = mockmvc.perform(get("/api/v1/fresh-products/list/")
                 .header("Authorization", "Bearer " + jwt)
-                .param("category","FR"))
+                .param("category","FS"))
                 .andExpect(resultMatcher)
                 .andReturn();
 
@@ -120,7 +120,7 @@ public class ProductIntegrationTest {
                 "    \"email\" : \"stockmanagertest@teste.com.br\",\n" +
                 "    \"cpf\" : \"000-000-000-01\",\n" +
                 "    \"password\" : \"abcd1234\",\n" +
-                "    \"warehouse_id\": 1,\n" +
+                "    \"warehouse_id\": 2,\n" +
                 "    \"role\" : [\"manager\"]\n" +
                 "}";
     }
@@ -194,7 +194,7 @@ public class ProductIntegrationTest {
     @Test
     void validProductListByCategory() throws Exception {
 
-        List<ProductDTOi> productDTOis = productRepository.findAllByBatchListExistsBySection("FROZEN");
+        List<ProductDTOi> productDTOis = productRepository.findAllByBatchListExistsBySection("FRESH");
 
         List<ProductDTOiImpl> productDTOiList = objectMapper.readValue(getAllProductByCategory(status().isOk(), CUSTOMER_JWT),
                 new TypeReference<>() {  });

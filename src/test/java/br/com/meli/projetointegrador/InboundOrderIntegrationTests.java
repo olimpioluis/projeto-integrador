@@ -92,7 +92,7 @@ public class InboundOrderIntegrationTests {
                 "    \"email\" : \"stockmanagertest@teste.com.br\",\n" +
                 "    \"cpf\" : \"000-000-000-01\",\n" +
                 "    \"password\" : \"abcd1234\",\n" +
-                "    \"warehouse_id\": 1,\n" +
+                "    \"warehouse_id\": 2,\n" +
                 "    \"role\" : [\"manager\"]\n" +
                 "}";
     }
