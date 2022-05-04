@@ -1,0 +1,610 @@
+{
+	"info": {
+		"_postman_id": "2923f2a4-231d-4cc8-bda6-253a93623794",
+		"name": "Projeto Integrador",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Inbound Order",
+			"item": [
+				{
+					"name": "Create Inbound Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdG9ja21hbmFnZXJ0ZXN0IiwiaWF0IjoxNjUxNjA2MDY5LCJleHAiOjE2NTE2OTI0Njl9.uvnrjBq2JC8KvGaX4Nlng0idZ--mwtr7iOBZ2GC9F0VW503pD0H8-sUzrib6XEoTNk01kNi8hZ1yWBvjuHjcWQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderNumber\": 2,\n    \"orderDate\": \"2020-01-05\",\n    \"section\": {\n        \"sectionCode\": 1,\n        \"warehouseCode\": 1\n    },\n    \"batchStock\": [\n        {\n            \"productId\": 1,\n            \"currentTemperature\": -1,\n            \"minTemperature\": -10,\n            \"initialQuantity\": 20,\n            \"currentQuantity\": 20,\n            \"manufacturingDate\": \"2022-10-10\",\n            \"manufacturingTime\": \"2022-10-10T00:00:00\",\n            \"expirationDate\": \"2022-10-10\"\n        },\n        {\n            \"productId\": 2,\n            \"currentTemperature\": -5,\n            \"minTemperature\": -10,\n            \"initialQuantity\": 20,\n            \"currentQuantity\": 20,\n            \"manufacturingDate\": \"2022-10-10\",\n            \"manufacturingTime\": \"2022-10-10T00:00:00\",\n            \"expirationDate\": \"2022-10-10\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{$baseUrl}}/inboundorder",
+							"host": [
+								"{{$baseUrl}}"
+							],
+							"path": [
+								"inboundorder"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Inbound Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdG9ja21hbmFnZXJ0ZXN0IiwiaWF0IjoxNjUxNjA0NDMxLCJleHAiOjE2NTE2OTA4MzF9.0sUe83VJexFKLyQl3KP2ZyZ86S5_wqk4d8Pv-sroQouXc8FTK3rTVhubA5UQu8u0PDP6Wj51AeMBqTHbgKeOiA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inboundOrderId\": 1,\n    \"orderDate\": \"2022-01-10\",\n    \"batchStock\": [\n        {\n            \"id\": 1,\n            \"manufacturingDate\": \"2022-11-09\",\n            \"manufacturingTime\": \"2022-11-09T00:00:00\",\n            \"expirationDate\": \"2022-11-15\"\n        },\n        {\n            \"id\": 2,\n            \"manufacturingDate\": \"2022-11-09\",\n            \"manufacturingTime\": \"2022-11-09T00:00:00\",\n            \"expirationDate\": \"2022-11-15\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{$baseUrl}}/inboundorder",
+							"host": [
+								"{{$baseUrl}}"
+							],
+							"path": [
+								"inboundorder"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Purchase Order",
+			"item": [
+				{
+					"name": "Create Purchase Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjdXN0b21lcnRlc3QiLCJpYXQiOjE2NTE2MDYwMDEsImV4cCI6MTY1MTY5MjQwMX0.7wStt6WGPRabEBF4C97b9NOz6q0EenJOA4lFPEKbS0NxFI6e0Hl5Rp19ONX1P8PyndzPqy27N33NUfQyz9GN9Q",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderDate\": \"2022-02-02\",\n    \"customerId\": 1,\n    \"orderStatus\": {\n        \"statusCode\": \"CART\"\n    },\n    \"items\": [\n        {\n            \"advertisementId\": 1,\n            \"quantity\": 2\n        },\n        {\n            \"advertisementId\": 2,\n            \"quantity\": 5\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{$baseUrl}}/orders",
+							"host": [
+								"{{$baseUrl}}"
+							],
+							"path": [
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order Products",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjdXN0b21lcnRlc3QiLCJpYXQiOjE2NTE2MDYwMDEsImV4cCI6MTY1MTY5MjQwMX0.7wStt6WGPRabEBF4C97b9NOz6q0EenJOA4lFPEKbS0NxFI6e0Hl5Rp19ONX1P8PyndzPqy27N33NUfQyz9GN9Q",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{$baseUrl}}/orders/1",
+							"host": [
+								"{{$baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Purchase Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjdXN0b21lcnRlc3QiLCJpYXQiOjE2NTE2MDYwMDEsImV4cCI6MTY1MTY5MjQwMX0.7wStt6WGPRabEBF4C97b9NOz6q0EenJOA4lFPEKbS0NxFI6e0Hl5Rp19ONX1P8PyndzPqy27N33NUfQyz9GN9Q",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{$baseUrl}}/orders/1",
+							"host": [
+								"{{$baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Signup Manager",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\" : \"stockmanagertest\",\n    \"username\" : \"stockmanagertest\",\n    \"email\" : \"stockmanagertest@teste.com.br\",\n    \"cpf\" : \"000-000-000-01\",\n    \"password\" : \"abcd1234\",\n    \"warehouse_id\": 1,\n    \"role\" : [\"manager\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{$authUrl}}/signup",
+							"host": [
+								"{{$authUrl}}"
+							],
+							"path": [
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Signup Customer",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\" : \"customertest\",\n    \"username\" : \"customertest\",\n    \"email\" : \"customertest@teste.com.br\",\n    \"cpf\" : \"000-000-000-03\",\n    \"password\" : \"abcd1234\",\n    \"role\" : [\"customer\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{$authUrl}}/signup",
+							"host": [
+								"{{$authUrl}}"
+							],
+							"path": [
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Signup Seller",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\" : \"sellertest\",\n    \"username\" : \"sellertest\",\n    \"email\" : \"sellertest@teste.com.br\",\n    \"cpf\" : \"000-000-000-02\",\n    \"password\" : \"abcd1234\",\n    \"role\" : [\"seller\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{$authUrl}}/signup",
+							"host": [
+								"{{$authUrl}}"
+							],
+							"path": [
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Signin Manager",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\" : \"stockmanagertest\",\n    \"password\" : \"abcd1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{$authUrl}}/signin",
+							"host": [
+								"{{$authUrl}}"
+							],
+							"path": [
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Signin Customer",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\" : \"customertest\",\n    \"password\" : \"abcd1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{$authUrl}}/signin",
+							"host": [
+								"{{$authUrl}}"
+							],
+							"path": [
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Signin Seller",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\" : \"sellertest\",\n    \"password\" : \"abcd1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{$authUrl}}/signin",
+							"host": [
+								"{{$authUrl}}"
+							],
+							"path": [
+								"signin"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Due Date",
+			"item": [
+				{
+					"name": "Get Batch Due Date By Section",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdG9ja21hbmFnZXJ0ZXN0IiwiaWF0IjoxNjUxNTkzOTIwLCJleHAiOjE2NTE2ODAzMjB9.B4KIelctp9cb7EhNIHs6xYl0TpF9GIFAtngeGeXcr2Hzgl1MUUf-BvjQ4IXT7_QzGMCEwetoYwn-4ez_olOCDA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{$baseUrl}}/due-date?days=300&id=1",
+							"host": [
+								"{{$baseUrl}}"
+							],
+							"path": [
+								"due-date"
+							],
+							"query": [
+								{
+									"key": "days",
+									"value": "300"
+								},
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Batch Due Date by category",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdG9ja21hbmFnZXJ0ZXN0IiwiaWF0IjoxNjUxNTkzOTIwLCJleHAiOjE2NTE2ODAzMjB9.B4KIelctp9cb7EhNIHs6xYl0TpF9GIFAtngeGeXcr2Hzgl1MUUf-BvjQ4IXT7_QzGMCEwetoYwn-4ez_olOCDA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{$baseUrl}}/due-date/list?days=300&category=FROZEN&order=asc",
+							"host": [
+								"{{$baseUrl}}"
+							],
+							"path": [
+								"due-date",
+								"list"
+							],
+							"query": [
+								{
+									"key": "days",
+									"value": "300"
+								},
+								{
+									"key": "category",
+									"value": "FROZEN"
+								},
+								{
+									"key": "order",
+									"value": "asc"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product",
+			"item": [
+				{
+					"name": "Product WIth Batch Ordered",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdG9ja21hbmFnZXJ0ZXN0IiwiaWF0IjoxNjUxNTkzOTIwLCJleHAiOjE2NTE2ODAzMjB9.B4KIelctp9cb7EhNIHs6xYl0TpF9GIFAtngeGeXcr2Hzgl1MUUf-BvjQ4IXT7_QzGMCEwetoYwn-4ez_olOCDA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderNumber\": 2,\n    \"orderDate\": \"2020-01-05\",\n    \"section\": {\n        \"sectionCode\": 3,\n        \"warehouseCode\": 1\n    },\n    \"batchStock\": [\n        {\n            \"productId\": 2,\n            \"currentTemperature\": 25.5,\n            \"minTemperature\": 10.5,\n            \"initialQuantity\": 20,\n            \"currentQuantity\": 20,\n            \"manufacturingDate\": \"2022-01-01\",\n            \"manufacturingTime\": \"2022-01-01T00:00:00\",\n            \"expirationDate\": \"2022-02-02\"\n        },\n        {\n            \"productId\": 1,\n            \"currentTemperature\": 25.5,\n            \"minTemperature\": 10.5,\n            \"initialQuantity\": 20,\n            \"currentQuantity\": 20,\n            \"manufacturingDate\": \"2022-01-01\",\n            \"manufacturingTime\": \"2022-01-01T00:00:00\",\n            \"expirationDate\": \"2022-02-02\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{$baseUrl}}/product?productId=1&orderBy=L",
+							"host": [
+								"{{$baseUrl}}"
+							],
+							"path": [
+								"product"
+							],
+							"query": [
+								{
+									"key": "productId",
+									"value": "1"
+								},
+								{
+									"key": "orderBy",
+									"value": "L"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Products List",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjdXN0b21lcnRlc3QiLCJpYXQiOjE2NTE2MDQ1NjQsImV4cCI6MTY1MTY5MDk2NH0.Pu1R0WRbCU8CiEHGy9F40qkwDY18EMM0rBQM-Qcq-cBZqyfuvUf5HJm8GODjvSQJuydIzTMB_mjPG-2LhOjWoA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{$baseUrl}}/",
+							"host": [
+								"{{$baseUrl}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Products WIth Batch by Category",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjdXN0b21lcnRlc3QiLCJpYXQiOjE2NTE2MDQ1NjQsImV4cCI6MTY1MTY5MDk2NH0.Pu1R0WRbCU8CiEHGy9F40qkwDY18EMM0rBQM-Qcq-cBZqyfuvUf5HJm8GODjvSQJuydIzTMB_mjPG-2LhOjWoA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{$baseUrl}}/list?category=FF",
+							"host": [
+								"{{$baseUrl}}"
+							],
+							"path": [
+								"list"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "FF"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Warehouse",
+			"item": [
+				{
+					"name": "Products By Warehouse",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdG9ja21hbmFnZXJ0ZXN0IiwiaWF0IjoxNjUxNTkzOTIwLCJleHAiOjE2NTE2ODAzMjB9.B4KIelctp9cb7EhNIHs6xYl0TpF9GIFAtngeGeXcr2Hzgl1MUUf-BvjQ4IXT7_QzGMCEwetoYwn-4ez_olOCDA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{$baseUrl}}/warehouse?productId=1",
+							"host": [
+								"{{$baseUrl}}"
+							],
+							"path": [
+								"warehouse"
+							],
+							"query": [
+								{
+									"key": "productId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "$baseUrl",
+			"value": "http://localhost:8080/api/v1/fresh-products"
+		},
+		{
+			"key": "$authUrl",
+			"value": "http://localhost:8080/api/auth"
+		}
+	]
+}
