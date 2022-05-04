@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -95,7 +96,7 @@ public class WarehouseIntegrationTests {
                 "    \"email\" : \"stockmanagertest@teste.com.br\",\n" +
                 "    \"cpf\" : \"000-000-000-01\",\n" +
                 "    \"password\" : \"abcd1234\",\n" +
-                "    \"warehouse_id\": 1,\n" +
+                "    \"warehouse_id\": 2,\n" +
                 "    \"role\" : [\"manager\"]\n" +
                 "}";
     }
@@ -202,39 +203,11 @@ public class WarehouseIntegrationTests {
         InboundOrderDTO inboundOrderDTO = objectMapper.readValue(inboundOrderString, new TypeReference<>() {});
         postInboundOrder(inboundOrderDTO, status().isCreated(), STOCK_MANAGER_JWT);
 
-
-        SectionDTO inboundSectionDto = inboundOrderDTO.getSection();
-        inboundSectionDto.setSectionCode(3L);
-        inboundSectionDto.setWarehouseCode(1L);
-        inboundOrderDTO.setSection(inboundSectionDto);
-
-        List<BatchStockDTO> batchStockDTOList = inboundOrderDTO.getBatchStock();
-        BatchStockDTO batchStockDTO = batchStockDTOList.get(2);
-        batchStockDTO.setMinTemperature(10.8);
-        batchStockDTOList.add(batchStockDTO);
-
-        inboundOrderDTO.setBatchStock(batchStockDTOList);
-        postInboundOrder(inboundOrderDTO, status().isCreated(), STOCK_MANAGER_JWT);
-
-
         String resultStr = getProductsByWarehouse(1L, status().isOk(), STOCK_MANAGER_JWT);
         ProductStockWarehouseDTO productByWarehouse = objectMapper.readValue(resultStr, new TypeReference<>() {});
 
-
-        List<QuantityByWarehouseDTO> quantityByWarehouseDTOList = Arrays.asList(new QuantityByWarehouseDTO(BigDecimal.valueOf(20), BigInteger.valueOf(1)),
-                new QuantityByWarehouseDTO(BigDecimal.valueOf(20), BigInteger.valueOf(2)));
+        List<QuantityByWarehouseDTO> quantityByWarehouseDTOList = Collections.singletonList(new QuantityByWarehouseDTO(BigDecimal.valueOf(20), BigInteger.valueOf(2)));
         ProductStockWarehouseDTO productByWarehouseTest = new ProductStockWarehouseDTO(1L, quantityByWarehouseDTOList);
-
-
-        assertEquals(productByWarehouse.getQuantityByWarehouseList().toString(), productByWarehouseTest.getQuantityByWarehouseList().toString());
-
-
-        resultStr = getProductsByWarehouse(2L, status().isOk(), STOCK_MANAGER_JWT);
-        productByWarehouse = objectMapper.readValue(resultStr, new TypeReference<>() {});
-
-        quantityByWarehouseDTOList = Arrays.asList(new QuantityByWarehouseDTO(BigDecimal.valueOf(60), BigInteger.valueOf(1)),
-                new QuantityByWarehouseDTO(BigDecimal.valueOf(40), BigInteger.valueOf(2)));
-        productByWarehouseTest = new ProductStockWarehouseDTO(2L, quantityByWarehouseDTOList);
 
         assertEquals(productByWarehouse.getQuantityByWarehouseList().toString(), productByWarehouseTest.getQuantityByWarehouseList().toString());
     }

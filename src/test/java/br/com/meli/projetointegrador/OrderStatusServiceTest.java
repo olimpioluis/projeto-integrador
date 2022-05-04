@@ -1,8 +1,10 @@
-package br.com.meli.projetointegrador.service;
+package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.model.*;
 import br.com.meli.projetointegrador.repository.ItemRepository;
 import br.com.meli.projetointegrador.repository.OrderStatusRepository;
+import br.com.meli.projetointegrador.service.OrderStatusService;
+import br.com.meli.projetointegrador.service.OrderStatusServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

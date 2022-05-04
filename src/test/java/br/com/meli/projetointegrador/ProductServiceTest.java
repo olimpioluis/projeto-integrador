@@ -1,4 +1,4 @@
-package br.com.meli.projetointegrador.service;
+package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.dto.ProductByBatchResponse;
 import br.com.meli.projetointegrador.dto.ProductByBatchResponseImpl;
@@ -8,6 +8,9 @@ import br.com.meli.projetointegrador.exception.InexistentProductException;
 import br.com.meli.projetointegrador.model.*;
 import br.com.meli.projetointegrador.repository.BatchRepository;
 import br.com.meli.projetointegrador.repository.ProductRepository;
+import br.com.meli.projetointegrador.service.BatchService;
+import br.com.meli.projetointegrador.service.ProductService;
+import br.com.meli.projetointegrador.service.ProductServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
