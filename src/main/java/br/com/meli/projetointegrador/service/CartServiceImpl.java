@@ -6,6 +6,7 @@ import br.com.meli.projetointegrador.model.Item;
 import br.com.meli.projetointegrador.model.OrderStatus;
 import br.com.meli.projetointegrador.model.StatusCode;
 import br.com.meli.projetointegrador.repository.CartRepository;
+import br.com.meli.projetointegrador.validator.OrderStatusCorrect;
 import br.com.meli.projetointegrador.validator.ProductExpirationDateGreaterThan3Weeks;
 import br.com.meli.projetointegrador.validator.ProductHasEnoughStock;
 import br.com.meli.projetointegrador.validator.Validator;
@@ -36,7 +37,8 @@ public class CartServiceImpl implements CartService {
     public BigDecimal save(Cart cart) {
         List<Validator> validators = Arrays.asList(
                 new ProductExpirationDateGreaterThan3Weeks(cart.getItems(), batchService),
-                new ProductHasEnoughStock(productService, cart.getItems())
+                new ProductHasEnoughStock(productService, cart.getItems()),
+                new OrderStatusCorrect(cart.getOrderStatus().getStatusCode())
         );
 
         validators.forEach(Validator::validate);
