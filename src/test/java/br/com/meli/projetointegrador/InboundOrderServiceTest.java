@@ -1,9 +1,10 @@
-package br.com.meli.projetointegrador.service;
+package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.exception.*;
 import br.com.meli.projetointegrador.model.*;
 import br.com.meli.projetointegrador.repository.*;
 import br.com.meli.projetointegrador.security.services.UserDetailsImpl;
+import br.com.meli.projetointegrador.service.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

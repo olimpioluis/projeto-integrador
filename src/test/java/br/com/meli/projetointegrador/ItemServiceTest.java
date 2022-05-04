@@ -1,9 +1,11 @@
-package br.com.meli.projetointegrador.service;
+package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.model.*;
 import br.com.meli.projetointegrador.repository.AdvertisementRepository;
 import br.com.meli.projetointegrador.repository.CartRepository;
 import br.com.meli.projetointegrador.repository.ItemRepository;
+import br.com.meli.projetointegrador.service.ItemService;
+import br.com.meli.projetointegrador.service.ItemServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
