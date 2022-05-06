@@ -1,16 +1,16 @@
 package br.com.meli.projetointegrador.service;
 
 import br.com.meli.projetointegrador.exception.InexistentCartException;
-import br.com.meli.projetointegrador.model.Cart;
-import br.com.meli.projetointegrador.model.Item;
-import br.com.meli.projetointegrador.model.OrderStatus;
-import br.com.meli.projetointegrador.model.StatusCode;
+import br.com.meli.projetointegrador.model.*;
 import br.com.meli.projetointegrador.repository.CartRepository;
+import br.com.meli.projetointegrador.security.services.UserDetailsImpl;
 import br.com.meli.projetointegrador.validator.OrderStatusCorrect;
 import br.com.meli.projetointegrador.validator.ProductExpirationDateGreaterThan3Weeks;
 import br.com.meli.projetointegrador.validator.ProductHasEnoughStock;
 import br.com.meli.projetointegrador.validator.Validator;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -32,6 +32,7 @@ public class CartServiceImpl implements CartService {
     private ItemService itemService;
     private CustomerService customerService;
     private OrderStatusService orderStatusService;
+    private PaymentService paymentService;
 
     @Override
     public BigDecimal save(Cart cart) {
@@ -44,6 +45,13 @@ public class CartServiceImpl implements CartService {
         validators.forEach(Validator::validate);
 
         cart.setTotalCart(cart.getItems().stream().reduce(BigDecimal.valueOf(0), (acc, nextItem) -> acc.add(BigDecimal.valueOf(nextItem.getQuantity()).multiply(nextItem.getAdvertisement().getPrice())), BigDecimal::add));
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl userDetails = (UserDetailsImpl) auth.getPrincipal();
+        Long userId = userDetails.getId();
+
+        Customer customer = customerService.findCustomerByUser_Id(userId);
+        cart.setCustomer(customer);
 
         orderStatusService.save(cart.getOrderStatus());
 
@@ -62,7 +70,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Cart updateCartToPurchase(Long id) {
+    public Payment updateCartToPurchase(Long id) {
         Cart cart = findById(id);
 
         List<Validator> validators = Arrays.asList(
@@ -74,9 +82,11 @@ public class CartServiceImpl implements CartService {
 
         cart.getOrderStatus().setStatusCode(StatusCode.PURCHASE);
 
-        batchService.takeOutProducts(cart.getItems());
+//        batchService.takeOutProducts(cart.getItems());
 
-        return cart;
+        Payment payment = paymentService.save(Payment.builder().customer(cart.getCustomer()).cart(cart).status(PaymentStatus.PENDING).value(cart.getTotalCart()).build());
+
+        return payment;
 
     }
 }

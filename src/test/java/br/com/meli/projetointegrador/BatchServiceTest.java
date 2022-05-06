@@ -1,10 +1,11 @@
 package br.com.meli.projetointegrador;
 
-import br.com.meli.projetointegrador.dto.QuantityByWarehouseDTO;
 import br.com.meli.projetointegrador.exception.InexistentBatchException;
-import br.com.meli.projetointegrador.exception.InexistentInboundOrderException;
 import br.com.meli.projetointegrador.exception.NotFoundProductException;
-import br.com.meli.projetointegrador.model.*;
+import br.com.meli.projetointegrador.model.Batch;
+import br.com.meli.projetointegrador.model.InboundOrder;
+import br.com.meli.projetointegrador.model.Product;
+import br.com.meli.projetointegrador.model.Section;
 import br.com.meli.projetointegrador.repository.BatchRepository;
 import br.com.meli.projetointegrador.service.BatchServiceImpl;
 import br.com.meli.projetointegrador.service.SectionService;
@@ -14,11 +15,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,7 +38,7 @@ public class BatchServiceTest {
         this.batchService = new BatchServiceImpl(batchRepository, sectionService);
     }
 
-    private List<Batch> generateBatches(){
+    private List<Batch> generateBatches() {
         return Arrays.asList(
                 new Batch(1L, 15.0, 12.0, 200, 200,
                         LocalDate.of(2022, 1, 1), LocalDateTime.of(2022, 1, 1, 0, 0),
@@ -65,7 +67,7 @@ public class BatchServiceTest {
     }
 
     @Test
-    public void inexistentBatchExceptionTest(){
+    public void inexistentBatchExceptionTest() {
         Mockito.when(batchRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
         assertThrows(InexistentBatchException.class, () -> batchService.findById(1L));
@@ -92,7 +94,7 @@ public class BatchServiceTest {
     }
 
     @Test
-    public void getBatchesWithExpirationDateGreaterThan3Weeks(){
+    public void getBatchesWithExpirationDateGreaterThan3Weeks() {
         List<Batch> batches = generateBatches();
 
         Mockito.when(batchRepository.findAllByProductId(Mockito.any())).thenReturn(batches);
@@ -102,7 +104,7 @@ public class BatchServiceTest {
     }
 
     @Test
-    public void findAllBatchesByProductTest(){
+    public void findAllBatchesByProductTest() {
 
         List<Batch> batches = generateBatches();
 
@@ -110,9 +112,6 @@ public class BatchServiceTest {
 
         assertEquals(batches.size(), batchService.findAllBatchesByProduct(1L).size());
     }
-
-
-
 
 
 }

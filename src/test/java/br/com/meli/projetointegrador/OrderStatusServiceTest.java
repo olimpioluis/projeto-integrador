@@ -1,7 +1,7 @@
 package br.com.meli.projetointegrador;
 
-import br.com.meli.projetointegrador.model.*;
-import br.com.meli.projetointegrador.repository.ItemRepository;
+import br.com.meli.projetointegrador.model.OrderStatus;
+import br.com.meli.projetointegrador.model.StatusCode;
 import br.com.meli.projetointegrador.repository.OrderStatusRepository;
 import br.com.meli.projetointegrador.service.OrderStatusService;
 import br.com.meli.projetointegrador.service.OrderStatusServiceImpl;
@@ -10,9 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

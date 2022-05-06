@@ -132,4 +132,28 @@ public class GeneralExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InexistentWalletException.class)
+    protected ResponseEntity<ErrorDTO> handleInexistentWalletException(InexistentWalletException ex){
+        ErrorDTO error = new ErrorDTO("InexistentWalletException",  ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InsufficientBalanceException.class)
+    protected ResponseEntity<ErrorDTO> handleInsufficientBalanceException(InsufficientBalanceException ex){
+        ErrorDTO error = new ErrorDTO("InsufficientBalanceException",  ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InexistentPaymentException.class)
+    protected ResponseEntity<ErrorDTO> handleInexistentPaymentException(InexistentPaymentException ex){
+        ErrorDTO error = new ErrorDTO("InexistentPaymentException",  ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserDoesNotMatchsTokenSentException.class)
+    protected ResponseEntity<ErrorDTO> handleUserDoesNotMatchsTokenSentException(UserDoesNotMatchsTokenSentException ex){
+        ErrorDTO error = new ErrorDTO("UserDoesNotMatchsTokenSentException",  ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
 }
