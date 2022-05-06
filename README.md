@@ -21,7 +21,7 @@ Quality and safety).
 
     ● To be able to consult the stock, list which products are in which warehouse and data a specific product, also understand in which warehouse it is stored.
 
-    ●  Being able to register the purchase order so that employees
+    ●  Being able to register a purchase order
 
 ```
 ## About CI/CD this project
@@ -35,7 +35,7 @@ Quality and safety).
 You run it using the ```java -jar``` or the ```mvn spring-boot:run``` commands.
 
 * Clone this repository 
-* Create a db with docker-compose
+* Create a db named meli_fresh with docker-compose
 * Make sure you are using JDK 1.8 and Maven 3.x
 * You can build the project and run the tests by running ```mvn clean package```
 * Once successfully built, you can run the service by one of these two methods:
@@ -54,14 +54,17 @@ http:/localhost:8080
 ## About the Service
 
 An online product sales platform wants to improve search options and
-filtering your products; For that, I decided to implement a search engine that,
+filtering your products; For that, It was decided to implement a search engine that,
 of the options that the user determines, returns the product(s) that he
 matches.
 
 ## ENDPOINTS 
 
-    When do you run this application you can acess the swagger in your localhost
+    When do you run this application you can acess the swagger in
 
+```
+http:/localhost:8080/swagger-ui.html
+```
 
 # About Spring Boot
 
