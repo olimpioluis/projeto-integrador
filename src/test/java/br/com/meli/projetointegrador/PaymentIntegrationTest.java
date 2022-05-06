@@ -1,37 +1,25 @@
 package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.dto.*;
-
-import br.com.meli.projetointegrador.exception.*;
-import br.com.meli.projetointegrador.model.*;
+import br.com.meli.projetointegrador.model.Payment;
+import br.com.meli.projetointegrador.model.PaymentStatus;
+import br.com.meli.projetointegrador.model.Wallet;
 import br.com.meli.projetointegrador.model.request.LoginRequest;
 import br.com.meli.projetointegrador.model.response.JwtResponse;
-import br.com.meli.projetointegrador.repository.*;
-import br.com.meli.projetointegrador.security.services.UserDetailsImpl;
-import br.com.meli.projetointegrador.service.*;
+import br.com.meli.projetointegrador.repository.PaymentRepository;
+import br.com.meli.projetointegrador.service.WalletService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -40,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-public class CartIntegrationTest {
+public class PaymentIntegrationTest {
 
     @Autowired
     private MockMvc mockmvc;
@@ -49,7 +37,10 @@ public class CartIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private CartRepository cartRepository;
+    private PaymentRepository paymentRepository;
+
+    @Autowired
+    private WalletService walletService;
 
     private static boolean init = false;
     private static String CUSTOMER_JWT = "";
@@ -108,8 +99,8 @@ public class CartIntegrationTest {
                 "}";
     }
 
-    public String postPurchaseOrder(){
-     return   "{\n" +
+    public String postPurchaseOrder() {
+        return "{\n" +
                 "    \"orderDate\": \"2022-02-02\",\n" +
                 "    \"customerId\": 1,\n" +
                 "    \"orderStatus\": {\n" +
@@ -118,11 +109,11 @@ public class CartIntegrationTest {
                 "    \"items\": [\n" +
                 "        {\n" +
                 "            \"advertisementId\": 1,\n" +
-                "            \"quantity\": 14\n" +
+                "            \"quantity\": 2\n" +
                 "        },\n" +
                 "        {\n" +
                 "            \"advertisementId\": 2,\n" +
-                "            \"quantity\": 14\n" +
+                "            \"quantity\": 2\n" +
                 "        }\n" +
                 "    ]\n" +
                 "}";
@@ -205,9 +196,53 @@ public class CartIntegrationTest {
         return response.getResponse().getContentAsString();
     }
 
-    private String getPurchaseOrder(ResultMatcher resultMatcher, String jwt) throws Exception {
+    private String postWalletBody() {
+        return "{\n" +
+                "    \"customerId\": 1,\n" +
+                "    \"walletNumber\": \"12345-25\"\n" +
+                "}";
+    }
 
-        MvcResult response = mockmvc.perform(get("/api/v1/fresh-products/orders/1")
+    private String putDepositBody() {
+        return "{\n" +
+                "    \"amount\": 120\n" +
+                "}";
+    }
+
+    public String postWallet(WalletDTO walletDTO, ResultMatcher resultMatcher, String jwt) throws Exception {
+        MvcResult response = mockmvc.perform(post("/api/v1/fresh-products/wallet")
+                .contentType("application/json")
+                .header("Authorization", "Bearer " + jwt)
+                .content(objectMapper.writeValueAsString(walletDTO)))
+                .andExpect(resultMatcher)
+                .andReturn();
+
+        return response.getResponse().getContentAsString();
+    }
+
+    public String putDepositWallet(WalletTransactionDTO transactionDTO, ResultMatcher resultMatcher, String jwt) throws Exception {
+        MvcResult response = mockmvc.perform(put("/api/v1/fresh-products/wallet/deposit/1")
+                .contentType("application/json")
+                .header("Authorization", "Bearer " + jwt)
+                .content(objectMapper.writeValueAsString(transactionDTO)))
+                .andExpect(resultMatcher)
+                .andReturn();
+
+        return response.getResponse().getContentAsString();
+    }
+
+    public String putFinishPayment(ResultMatcher resultMatcher, String jwt) throws Exception {
+        MvcResult response = mockmvc.perform(put("/api/v1/fresh-products/payment/1")
+                .contentType("application/json")
+                .header("Authorization", "Bearer " + jwt))
+                .andExpect(resultMatcher)
+                .andReturn();
+
+        return response.getResponse().getContentAsString();
+    }
+
+    public String getPayment(ResultMatcher resultMatcher, String jwt) throws Exception {
+        MvcResult response = mockmvc.perform(get("/api/v1/fresh-products/payment/1")
                 .header("Authorization", "Bearer " + jwt))
                 .andExpect(resultMatcher)
                 .andReturn();
@@ -238,6 +273,10 @@ public class CartIntegrationTest {
             });
             STOCK_MANAGER_JWT = jwtResponse.getToken();
 
+            String walletDTOString = postWalletBody();
+            WalletDTO walletDTO = objectMapper.readValue(walletDTOString, new TypeReference<>() {
+            });
+
             String inboundOrderString = getStandardInboundOrder();
             String purchaseOrderString = postPurchaseOrder();
             CartDTO cartDTO = objectMapper.readValue(purchaseOrderString, new TypeReference<CartDTO>() {
@@ -248,54 +287,55 @@ public class CartIntegrationTest {
 
             postInboundOrder(inboundOrderDTO, status().isCreated(), STOCK_MANAGER_JWT);
             postPurchaseOrder(cartDTO, status().isCreated(), CUSTOMER_JWT);
+            putPurchaseOrder(status().isOk(), CUSTOMER_JWT);
+
+            postWallet(walletDTO, status().isCreated(), CUSTOMER_JWT);
+
             init = true;
         }
     }
 
     @Test
-    void registerValidPurchaseOrder() throws Exception {
-
-        Cart cart = cartRepository.findById(1L).orElse(new Cart());
-
-        assertAll(
-                () -> assertEquals(BigDecimal.valueOf(840).setScale(2), cart.getTotalCart()),
-                () -> assertEquals(1, cart.getCustomer().getId())
-        );
-
-    }
-    @Test
-    void registerInvalidPurchaseOrder() throws Exception {
-
-        Cart cart = cartRepository.findById(1L).orElse(new Cart());
-
-        assertAll(
-                () -> assertEquals(BigDecimal.valueOf(840).setScale(2), cart.getTotalCart()),
-                () -> assertEquals(1, cart.getCustomer().getId())
-        );
-
-    }
-
-    @Test
-    void updatePurchaseOrder() throws Exception {
-
-        putPurchaseOrder(status().isOk(), CUSTOMER_JWT);
-        Cart cart = cartRepository.findById(1L).orElse(new Cart());
-
-        assertEquals("PURCHASE", cart.getOrderStatus().getStatusCode().name());
-
-    }
-
-    @Test
-    void validPurchaseOrder() throws  Exception{
-
-        CartWithStatusDTO cartWithStatusDTO = objectMapper.readValue(getPurchaseOrder(status().isOk(), CUSTOMER_JWT),
-                new TypeReference<CartWithStatusDTO>() {
+    public void makePayment() throws Exception {
+        String walletTransactionDTOString = putDepositBody();
+        WalletTransactionDTO walletTransactionDTO = objectMapper.readValue(walletTransactionDTOString, new TypeReference<WalletTransactionDTO>() {
         });
 
-        Cart cart = cartRepository.findById(1L).orElse(new Cart());
+        putDepositWallet(walletTransactionDTO, status().isOk(), CUSTOMER_JWT);
+        putFinishPayment(status().isOk(), CUSTOMER_JWT);
 
-        assertEquals( cartWithStatusDTO.getStatusCode(),cart.getOrderStatus().getStatusCode());
+        Payment payment = paymentRepository.findById(1L).orElse(new Payment());
+        Wallet wallet = walletService.findById(1L);
+
+        assertAll(
+                () -> assertEquals(PaymentStatus.PAID, payment.getStatus()),
+                () -> assertEquals(BigDecimal.valueOf(0).setScale(2), wallet.getBalance())
+        );
     }
 
+    @Test
+    public void makePaymentWithoutEnoughBalance() throws Exception {
+        Wallet wallet = walletService.findById(1L);
+
+        String responseStr = putFinishPayment(status().isBadRequest(), CUSTOMER_JWT);
+        ErrorDTO errorDto = objectMapper.readValue(responseStr, new TypeReference<>() {});
+
+        assertAll(
+                () -> assertEquals("Insufficient balance in the account to make the payment.", errorDto.getDescription()),
+                () -> assertEquals("InsufficientBalanceException", errorDto.getName()),
+                () -> assertEquals(BigDecimal.valueOf(0).setScale(2), wallet.getBalance())
+        );
+    }
+
+    @Test
+    public void getPayment() throws Exception {
+        String responseStr = getPayment(status().isOk(), CUSTOMER_JWT);
+        PaymentDTO paymentDTO = objectMapper.readValue(responseStr, new TypeReference<>() {});
+
+        assertAll(
+                () -> assertEquals(1L, paymentDTO.getId()),
+                () -> assertEquals(PaymentStatus.PENDING, paymentDTO.getPaymentStatus())
+        );
+    }
 
 }

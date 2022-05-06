@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CustomerServiceTest {
@@ -30,8 +32,17 @@ public class CustomerServiceTest {
 
         Customer customer = new Customer(1L, new User());
 
-        Mockito.when(customerRepository.findById(Mockito.any())).thenReturn(java.util.Optional.of(customer));
+        Mockito.when(customerRepository.findById(Mockito.any())).thenReturn(Optional.of(customer));
 
         assertEquals(1L, customerService.findById(1L).getId());
+    }
+
+    @Test
+    public void findByUserUsernameTest() {
+        Customer customer = new Customer(1L, new User("user", "1234526845-9", "usertest@email.com", "usertest", ""));
+
+        Mockito.when(customerRepository.findByUserUsername(Mockito.any())).thenReturn(Optional.of(customer));
+
+        assertEquals(1L, customerService.findByUserUsername("usertest").getId());
     }
 }

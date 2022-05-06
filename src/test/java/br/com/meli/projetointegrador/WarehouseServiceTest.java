@@ -1,6 +1,5 @@
 package br.com.meli.projetointegrador;
 
-
 import br.com.meli.projetointegrador.exception.InexistentWarehouseException;
 import br.com.meli.projetointegrador.model.Section;
 import br.com.meli.projetointegrador.model.StockManager;
@@ -35,15 +34,15 @@ public class WarehouseServiceTest {
     }
 
     @Test
-    public void findByIdTest(){
-        Warehouse warehouse = new Warehouse(1L,"Warehouse 1", Collections.singletonList(new StockManager()), Collections.singletonList(new Section()));
+    public void findByIdTest() {
+        Warehouse warehouse = new Warehouse(1L, "Warehouse 1", Collections.singletonList(new StockManager()), Collections.singletonList(new Section()));
         Mockito.when(warehouseRepository.findById(Mockito.any())).thenReturn(Optional.of(warehouse));
 
         assertEquals(warehouse.getName(), warehouseService.findById(1L).getName());
     }
 
     @Test
-    public void inexistentWarehouseException(){
+    public void inexistentWarehouseException() {
         Mockito.when(warehouseRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
         assertThrows(InexistentWarehouseException.class, () -> warehouseService.findById(1L));

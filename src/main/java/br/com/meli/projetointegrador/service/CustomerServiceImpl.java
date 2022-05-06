@@ -16,4 +16,14 @@ public class CustomerServiceImpl implements CustomerService {
     public Customer findById(Long id) {
         return customerRepository.findById(id).orElseThrow(() -> new InexistentCustomerException("Customer " + id + " does not exists!"));
     }
+
+    @Override
+    public Customer findByUserUsername(String username) {
+        return customerRepository.findByUserUsername(username).orElseThrow(() -> new InexistentCustomerException("Customer with username " + username + " does not exists!"));
+    }
+
+    @Override
+    public Customer findCustomerByUser_Id(Long userId) {
+        return customerRepository.findCustomerByUser_Id(userId).orElseThrow(() -> new InexistentCustomerException("Customer with user id " + userId + " does not exists!"));
+    }
 }
