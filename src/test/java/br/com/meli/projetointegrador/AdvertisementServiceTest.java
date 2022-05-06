@@ -11,9 +11,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.math.BigDecimal;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AdvertisementServiceTest {
 
@@ -34,6 +34,6 @@ public class AdvertisementServiceTest {
 
         Mockito.when(advertisementRepository.findById(Mockito.any())).thenReturn(java.util.Optional.of(advertisement));
 
-         assertEquals("Advertisement 1", advertisementService.findById(1L).getTitle());
+        assertEquals("Advertisement 1", advertisementService.findById(1L).getTitle());
     }
 }

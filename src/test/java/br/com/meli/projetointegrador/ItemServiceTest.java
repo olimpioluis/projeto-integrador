@@ -1,8 +1,8 @@
 package br.com.meli.projetointegrador;
 
-import br.com.meli.projetointegrador.model.*;
-import br.com.meli.projetointegrador.repository.AdvertisementRepository;
-import br.com.meli.projetointegrador.repository.CartRepository;
+import br.com.meli.projetointegrador.model.Advertisement;
+import br.com.meli.projetointegrador.model.Cart;
+import br.com.meli.projetointegrador.model.Item;
 import br.com.meli.projetointegrador.repository.ItemRepository;
 import br.com.meli.projetointegrador.service.ItemService;
 import br.com.meli.projetointegrador.service.ItemServiceImpl;
@@ -30,7 +30,7 @@ public class ItemServiceTest {
         this.itemService = new ItemServiceImpl(itemRepository);
     }
 
-    private List<Item> generateItem(){
+    private List<Item> generateItem() {
         return Arrays.asList(
                 new Item(1L, new Advertisement(), new Cart(), 3),
                 new Item(1L, new Advertisement(), new Cart(), 3));

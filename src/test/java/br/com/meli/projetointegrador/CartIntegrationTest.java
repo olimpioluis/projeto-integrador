@@ -1,29 +1,39 @@
 package br.com.meli.projetointegrador;
 
-import br.com.meli.projetointegrador.dto.CartDTO;
-import br.com.meli.projetointegrador.dto.CartWithStatusDTO;
-import br.com.meli.projetointegrador.dto.InboundOrderDTO;
+import br.com.meli.projetointegrador.dto.*;
 
-import br.com.meli.projetointegrador.model.Cart;
+import br.com.meli.projetointegrador.exception.*;
+import br.com.meli.projetointegrador.model.*;
 import br.com.meli.projetointegrador.model.request.LoginRequest;
 import br.com.meli.projetointegrador.model.response.JwtResponse;
-import br.com.meli.projetointegrador.repository.CartRepository;
+import br.com.meli.projetointegrador.repository.*;
+import br.com.meli.projetointegrador.security.services.UserDetailsImpl;
+import br.com.meli.projetointegrador.service.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 

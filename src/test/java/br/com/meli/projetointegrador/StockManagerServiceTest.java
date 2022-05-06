@@ -32,7 +32,7 @@ public class StockManagerServiceTest {
     }
 
     @Test
-    public void findByIdTest(){
+    public void findByIdTest() {
         StockManager stockManager = new StockManager(1L, new User(1L, "Igor", "123.456.789-10", "igor@gmail.com"), new Warehouse());
         Mockito.when(stockManagerRepository.findById(Mockito.any())).thenReturn(Optional.of(stockManager));
 
@@ -41,13 +41,11 @@ public class StockManagerServiceTest {
     }
 
     @Test
-    public void inexistentStockManagerExceptionTest(){
+    public void inexistentStockManagerExceptionTest() {
         Mockito.when(stockManagerRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
         assertThrows(InexistentStockManagerException.class, () -> stockManagerService.findById(1L));
     }
-
-
 
 
 }

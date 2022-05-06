@@ -23,13 +23,9 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ProductServiceTest {
 
@@ -52,13 +48,13 @@ public class ProductServiceTest {
     @Test
     public void findByIdTest() {
         Mockito.when(productRepository.findById(Mockito.any()))
-                .thenReturn(java.util.Optional.of(new Product(1L, "Product 1", 20.0, 2.0, 2.0, Collections.singletonList(new Batch()))));
+                .thenReturn(Optional.of(new Product(1L, "Product 1", 20.0, 2.0, 2.0, Collections.singletonList(new Batch()))));
 
         assertEquals("Product 1", productService.findById(1L).getName());
     }
 
     @Test
-    public void inexistentProductException(){
+    public void inexistentProductException() {
         Mockito.when(productRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
         assertThrows(InexistentProductException.class, () -> productService.findById(1L));
@@ -67,15 +63,15 @@ public class ProductServiceTest {
     @Test
     public void getProductsThatHaveBatch() {
         List<ProductByBatchResponse> listProductBatch = Collections.singletonList(
-                new ProductByBatchResponseImpl(BigInteger.ONE, 6.0,"Shampoo", 17.5, 5.0,
+                new ProductByBatchResponseImpl(BigInteger.ONE, 6.0, "Shampoo", 17.5, 5.0,
                         BigInteger.TWO, "2022-02-02", 20)
         );
         List<ProductByBatchResponse> listProductQuantity = Collections.singletonList(
-                new ProductByBatchResponseImpl(BigInteger.ONE, 17.5, "Shampoo",5.0, 6.0, BigInteger.valueOf(3),
+                new ProductByBatchResponseImpl(BigInteger.ONE, 17.5, "Shampoo", 5.0, 6.0, BigInteger.valueOf(3),
                         "2023-02-02", 50)
         );
         List<ProductByBatchResponse> listProductExpiration = Collections.singletonList(
-                new ProductByBatchResponseImpl(BigInteger.ONE,17.5,"Shampoo" ,5.0, 6.0, BigInteger.valueOf(4),
+                new ProductByBatchResponseImpl(BigInteger.ONE, 17.5, "Shampoo", 5.0, 6.0, BigInteger.valueOf(4),
                         "2024-08-08", 30)
         );
 
@@ -93,7 +89,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void findAllProductsTest(){
+    public void findAllProductsTest() {
         List<Product> products = Arrays.asList(
                 new Product(1L, "Tomato", 2.00, 5.0, 4.0, Collections.singletonList(new Batch())),
                 new Product(2L, "Meat", 40.00, 10.0, 10.0, Collections.singletonList(new Batch())));
@@ -104,7 +100,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void findAllByBatchListExistsTest(){
+    public void findAllByBatchListExistsTest() {
         List<ProductDTOi> productDTOis = Arrays.asList(
                 new ProductDTOiImpl(1L, "Tomato", 45),
                 new ProductDTOiImpl(2L, "Meat", 30));
@@ -115,7 +111,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void findAllByBatchListExistsBySectionTest(){
+    public void findAllByBatchListExistsBySectionTest() {
         List<ProductDTOi> productDTOis = Arrays.asList(
                 new ProductDTOiImpl(1L, "Chicken", 45),
                 new ProductDTOiImpl(2L, "Meat", 30));
@@ -126,9 +122,9 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void getTotalQuantity(){
-        Product productTomato= new Product(1L, "Tomato", 2.00, 5.0, 4.0, Collections.singletonList(new Batch()));
-        Product productMeat= new Product(2L, "Meat", 40.00, 10.0, 10.0, Collections.singletonList(new Batch()));
+    public void getTotalQuantity() {
+        Product productTomato = new Product(1L, "Tomato", 2.00, 5.0, 4.0, Collections.singletonList(new Batch()));
+        Product productMeat = new Product(2L, "Meat", 40.00, 10.0, 10.0, Collections.singletonList(new Batch()));
 
         Section section1 = new Section(1L, "Section 1", Category.FRESH, 6, 6, new Warehouse(), Collections.singletonList(new Batch()));
         Section section2 = new Section(2L, "Section 2", Category.FROZEN, 6, 6, new Warehouse(), Collections.singletonList(new Batch()));
@@ -145,9 +141,6 @@ public class ProductServiceTest {
 
         assertEquals(200, productService.getTotalQuantity(1L));
     }
-
-
-
 
 
 }

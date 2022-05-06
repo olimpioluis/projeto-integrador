@@ -1,14 +1,8 @@
 package br.com.meli.projetointegrador;
 
+import br.com.meli.projetointegrador.exception.InexistentSectionException;
 import br.com.meli.projetointegrador.model.*;
 import br.com.meli.projetointegrador.repository.SectionRepository;
-
-import br.com.meli.projetointegrador.exception.InexistentSectionException;
-import br.com.meli.projetointegrador.model.Batch;
-import br.com.meli.projetointegrador.model.Category;
-import br.com.meli.projetointegrador.model.Section;
-import br.com.meli.projetointegrador.model.Warehouse;
-
 import br.com.meli.projetointegrador.service.SectionService;
 import br.com.meli.projetointegrador.service.SectionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,18 +10,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SectionServiceTest {
 
@@ -45,25 +37,25 @@ public class SectionServiceTest {
     private List<Batch> generateBatchFreshList(Section section) {
 
         return Arrays.asList(
-                new Batch(1L, 25.5, 10.5, 20, 20, LocalDate.of(2022,1,1), LocalDateTime.of(2022, 1, 1,0,0,0,0), LocalDate.of(2022, 05, 27), new Product(), new InboundOrder(), section),
-                new Batch(1L, 25.5, 11.5, 20, 20, LocalDate.of(2022,1,1), LocalDateTime.of(2022, 1, 1,0,0,0,0), LocalDate.of(2022, 06, 27), new Product(), new InboundOrder(), section),
-                new Batch(1L, 25.5, 12.5, 20, 20, LocalDate.of(2022,1,1), LocalDateTime.of(2022, 1, 1,0,0,0,0), LocalDate.of(2022, 07, 27), new Product(), new InboundOrder(), section)
+                new Batch(1L, 25.5, 10.5, 20, 20, LocalDate.of(2022, 1, 1), LocalDateTime.of(2022, 1, 1, 0, 0, 0, 0), LocalDate.of(2022, 05, 27), new Product(), new InboundOrder(), section),
+                new Batch(1L, 25.5, 11.5, 20, 20, LocalDate.of(2022, 1, 1), LocalDateTime.of(2022, 1, 1, 0, 0, 0, 0), LocalDate.of(2022, 06, 27), new Product(), new InboundOrder(), section),
+                new Batch(1L, 25.5, 12.5, 20, 20, LocalDate.of(2022, 1, 1), LocalDateTime.of(2022, 1, 1, 0, 0, 0, 0), LocalDate.of(2022, 07, 27), new Product(), new InboundOrder(), section)
         );
     }
 
     private List<Batch> generateBatchFrozenList(Section section) {
 
         return Arrays.asList(
-                new Batch(1L, 25.5, -10.5, 20, 20, LocalDate.of(2022,1,1), LocalDateTime.of(2022, 1, 1,0,0,0,0), LocalDate.of(2022, 05, 27), new Product(), new InboundOrder(), section),
-                new Batch(1L, 25.5, -11.5, 20, 20, LocalDate.of(2022,1,1), LocalDateTime.of(2022, 1, 1,0,0,0,0), LocalDate.of(2022, 06, 27), new Product(), new InboundOrder(), section)
+                new Batch(1L, 25.5, -10.5, 20, 20, LocalDate.of(2022, 1, 1), LocalDateTime.of(2022, 1, 1, 0, 0, 0, 0), LocalDate.of(2022, 05, 27), new Product(), new InboundOrder(), section),
+                new Batch(1L, 25.5, -11.5, 20, 20, LocalDate.of(2022, 1, 1), LocalDateTime.of(2022, 1, 1, 0, 0, 0, 0), LocalDate.of(2022, 06, 27), new Product(), new InboundOrder(), section)
         );
     }
 
     @Test
     public void findByIdTest() {
         Mockito.when(sectionRepository.findById(1L))
-                .thenReturn(java.util.Optional.of(new Section(1L, "Section 1", Category.FRESH, 10, 10, new Warehouse(), Arrays.asList(new Batch()))));
-            Section section = sectionService.findById(1L);
+                .thenReturn(Optional.of(new Section(1L, "Section 1", Category.FRESH, 10, 10, new Warehouse(), Arrays.asList(new Batch()))));
+        Section section = sectionService.findById(1L);
 
         assertEquals("Section 1", section.getName());
     }
@@ -74,7 +66,7 @@ public class SectionServiceTest {
         List<Batch> batchList = generateBatchFreshList(section);
         section.setBatchList(batchList);
         Mockito.when(sectionRepository.findById(1L))
-                .thenReturn(java.util.Optional.of(section));
+                .thenReturn(Optional.of(section));
 
         assertEquals(1, sectionService.checkBatchStockDueDate(1L, 50).size());
         assertEquals(2, sectionService.checkBatchStockDueDate(1L, 80).size());
@@ -101,18 +93,18 @@ public class SectionServiceTest {
     }
 
     @Test
-    public void inexistentSectionException(){
+    public void inexistentSectionException() {
         Mockito.when(sectionRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
         assertThrows(InexistentSectionException.class, () -> sectionService.findById(1L));
     }
 
     @Test
-    public void updateCurrentSizeTest(){
+    public void updateCurrentSizeTest() {
         Section section = new Section(1L, "Section 1", Category.FRESH, 10, 10, new Warehouse(), Collections.singletonList(new Batch()));
 
         Mockito.when(sectionRepository.findById(Mockito.any()))
-                .thenReturn(java.util.Optional.of(section));
+                .thenReturn(Optional.of(section));
         Mockito.when(sectionRepository.save(Mockito.any()))
                 .thenReturn(section);
 
