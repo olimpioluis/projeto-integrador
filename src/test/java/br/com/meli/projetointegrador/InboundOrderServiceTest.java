@@ -2,7 +2,7 @@ package br.com.meli.projetointegrador;
 
 import br.com.meli.projetointegrador.exception.*;
 import br.com.meli.projetointegrador.model.*;
-import br.com.meli.projetointegrador.repository.*;
+import br.com.meli.projetointegrador.repository.InboundOrderRepository;
 import br.com.meli.projetointegrador.security.services.UserDetailsImpl;
 import br.com.meli.projetointegrador.service.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,16 +13,13 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithSecurityContext;
-import org.springframework.security.test.context.support.WithUserDetails;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class InboundOrderServiceTest {
 
@@ -40,25 +37,25 @@ public class InboundOrderServiceTest {
     private WarehouseService warehouseService;
 
     @BeforeEach
-    private void initializeInboundOrderService(){
-       MockitoAnnotations.openMocks(this);
-       this.inboundOrderService = new InboundOrderServiceImpl(inboundOrderRepository, batchService, sectionService, stockManagerService, warehouseService);
-   }
+    private void initializeInboundOrderService() {
+        MockitoAnnotations.openMocks(this);
+        this.inboundOrderService = new InboundOrderServiceImpl(inboundOrderRepository, batchService, sectionService, stockManagerService, warehouseService);
+    }
 
-   private void initializeAuthentication(){
-       Authentication authentication = Mockito.mock(Authentication.class);
-       SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+    private void initializeAuthentication() {
+        Authentication authentication = Mockito.mock(Authentication.class);
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
 
-       Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-       Mockito.when((UserDetailsImpl) authentication.getPrincipal()).thenReturn(UserDetailsImpl.build(new User(1L, "Igor", "123.456.789-10", "igor@gmail.com", "igor_sn", "abcd1234", Set.of(new Role(1, ERole.ROLE_STOCK_MANAGER)))));
-       SecurityContextHolder.setContext(securityContext);
-   }
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        Mockito.when((UserDetailsImpl) authentication.getPrincipal()).thenReturn(UserDetailsImpl.build(new User(1L, "Igor", "123.456.789-10", "igor@gmail.com", "igor_sn", "abcd1234", Set.of(new Role(1, ERole.ROLE_STOCK_MANAGER)))));
+        SecurityContextHolder.setContext(securityContext);
+    }
 
-    private InboundOrder generateInboundOrder(){
+    private InboundOrder generateInboundOrder() {
         StockManager stockManagerIgor = new StockManager(1L, new User(1L, "Igor", "123.456.789-10", "igor@gmail.com", "igor_sn", "abcd1234", Set.of(new Role(1, ERole.ROLE_STOCK_MANAGER))), new Warehouse());
         StockManager stockManagerJederson = new StockManager(2L, new User(2L, "Jederson", "103.476.729-30", "jederson@gmail.com", "jed", "abcd1234", Set.of(new Role(1, ERole.ROLE_STOCK_MANAGER))), new Warehouse());
 
-        Warehouse warehouse = new Warehouse(1L,"Warehouse 1", Arrays.asList(stockManagerIgor, stockManagerJederson), Collections.singletonList(new Section()));
+        Warehouse warehouse = new Warehouse(1L, "Warehouse 1", Arrays.asList(stockManagerIgor, stockManagerJederson), Collections.singletonList(new Section()));
 
         stockManagerIgor.setWarehouse(warehouse);
         stockManagerJederson.setWarehouse(warehouse);
@@ -68,16 +65,16 @@ public class InboundOrderServiceTest {
 
         warehouse.setSectionList(Arrays.asList(section1, section2));
 
-        Product productTomato= new Product(1L, "Tomato", 2.00, 5.0, 4.0, Collections.singletonList(new Batch()));
-        Product productMeat= new Product(2L, "Meat", 40.00, 10.0, 10.0, Collections.singletonList(new Batch()));
+        Product productTomato = new Product(1L, "Tomato", 2.00, 5.0, 4.0, Collections.singletonList(new Batch()));
+        Product productMeat = new Product(2L, "Meat", 40.00, 10.0, 10.0, Collections.singletonList(new Batch()));
 
         List<Batch> batchList = Arrays.asList(
                 new Batch(1L, 15.0, 12.0, 200, 200,
                         LocalDate.of(2022, 1, 1), LocalDateTime.of(2022, 1, 1, 0, 0),
                         LocalDate.of(2022, 2, 2), productTomato, new InboundOrder(), section1),
                 new Batch(2L, 0.0, -15.0, 50, 50,
-                    LocalDate.of(2022, 3, 3), LocalDateTime.of(2022, 1, 3, 0, 0),
-                    LocalDate.of(2022, 4, 4), productMeat, new InboundOrder(), section2));
+                        LocalDate.of(2022, 3, 3), LocalDateTime.of(2022, 1, 3, 0, 0),
+                        LocalDate.of(2022, 4, 4), productMeat, new InboundOrder(), section2));
 
         productTomato.setBatchList(Collections.singletonList(batchList.get(0)));
         productMeat.setBatchList(Collections.singletonList(batchList.get(1)));
@@ -89,7 +86,7 @@ public class InboundOrderServiceTest {
     }
 
     @Test
-    public void saveInboundOrderTest(){
+    public void saveInboundOrderTest() {
         InboundOrder inboundOrder = generateInboundOrder();
 
         initializeAuthentication();
@@ -107,7 +104,7 @@ public class InboundOrderServiceTest {
     }
 
     @Test
-    public void updateInboundOrderTest(){
+    public void updateInboundOrderTest() {
         InboundOrder inboundOrder = generateInboundOrder();
 
         initializeAuthentication();
@@ -127,7 +124,7 @@ public class InboundOrderServiceTest {
     }
 
     @Test
-    public void InboudOrderFindByIdTest(){
+    public void InboudOrderFindByIdTest() {
         InboundOrder inboundOrder = generateInboundOrder();
 
         Mockito.when(inboundOrderRepository.findById(Mockito.any())).thenReturn(Optional.of(inboundOrder));
@@ -139,7 +136,7 @@ public class InboundOrderServiceTest {
     }
 
     @Test
-    public void SectionAvailableSpaceValidatorTest(){
+    public void SectionAvailableSpaceValidatorTest() {
         InboundOrder inboundOrder = generateInboundOrder();
 
         initializeAuthentication();
@@ -157,7 +154,7 @@ public class InboundOrderServiceTest {
     }
 
     @Test
-    public void WarehouseExistsValidatorTest(){
+    public void WarehouseExistsValidatorTest() {
         InboundOrder inboundOrder = generateInboundOrder();
 
         initializeAuthentication();
@@ -175,7 +172,7 @@ public class InboundOrderServiceTest {
     }
 
     @Test
-    public void SectionExistsValidatorTest(){
+    public void SectionExistsValidatorTest() {
         InboundOrder inboundOrder = generateInboundOrder();
 
         initializeAuthentication();
@@ -192,7 +189,7 @@ public class InboundOrderServiceTest {
     }
 
     @Test
-    public void SectionMatchWithWarehouseValidatorTest(){
+    public void SectionMatchWithWarehouseValidatorTest() {
         InboundOrder inboundOrder = generateInboundOrder();
 
         initializeAuthentication();
@@ -211,7 +208,7 @@ public class InboundOrderServiceTest {
     }
 
     @Test
-    public void SectionMatchWithBatchCategoryValidatorTest(){
+    public void SectionMatchWithBatchCategoryValidatorTest() {
         InboundOrder inboundOrder = generateInboundOrder();
 
         initializeAuthentication();
@@ -229,7 +226,7 @@ public class InboundOrderServiceTest {
     }
 
     @Test
-    public void inexistentInboundOrderException(){
+    public void inexistentInboundOrderException() {
         Mockito.when(inboundOrderRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
         assertThrows(InexistentInboundOrderException.class, () -> inboundOrderService.findById(1L));
